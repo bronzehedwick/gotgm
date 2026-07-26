@@ -27,6 +27,7 @@
     {"$GMFolder":"","%Name":"Combat","folderPath":"folders/Scripts/Combat.yy","name":"Combat","resourceType":"GMFolder","resourceVersion":"1.0",},
     {"$GMFolder":"","%Name":"Rooms","folderPath":"folders/Rooms.yy","name":"Rooms","resourceType":"GMFolder","resourceVersion":"1.0",},
   ],
+  "ForcedPrefabProjectReferences":[],
   "IncludedFiles":[],
   "isEcma":false,
   "LibraryEmitters":[],
@@ -70,7 +71,7 @@
     {"roomId":{"name":"rm_game","path":"rooms/rm_game/rm_game.yy",},},
   ],
   "templateType":null,
-  "textureGroups":[
+  "TextureGroups":[
     {"$GMTextureGroup":"","%Name":"Default","autocrop":true,"border":2,"compressFormat":"bz2","directory":"","groupParent":null,"isScaled":true,"loadType":"default","mipsToGenerate":0,"name":"Default","resourceType":"GMTextureGroup","resourceVersion":"2.0","targets":461609314234257646,"texturePageHeight":2048,"texturePageWidth":2048,},
   ],
 }

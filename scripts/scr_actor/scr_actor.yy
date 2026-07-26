@@ -1,0 +1,11 @@
+{
+  "resourceType": "GMScript",
+  "resourceVersion": "2.0",
+  "name": "scr_actor",
+  "isCompatibility": false,
+  "isDnD": false,
+  "parent": {
+    "name": "Actor",
+    "path": "folders/Scripts/Actor.yy"
+  }
+}

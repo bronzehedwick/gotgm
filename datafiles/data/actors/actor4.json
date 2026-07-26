@@ -1,0 +1,73 @@
+{
+  "actor_number": 4,
+  "actor_info": {
+    "move": 9,
+    "width": 16,
+    "height": 16,
+    "directions": 4,
+    "frames": 4,
+    "frame_speed": 8,
+    "frame_sequence": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "speed": 1,
+    "size_x": 15,
+    "size_y": 15,
+    "strength": 10,
+    "health": 10,
+    "num_moves": 1,
+    "shot_type": 50,
+    "shot_pattern": 4,
+    "shots_allowed": 1,
+    "solid": 0,
+    "flying": 1,
+    "rating": 0,
+    "type": 2,
+    "name": "EAGLE",
+    "func_num": 0,
+    "func_pass": 0,
+    "magic_hurts": 0
+  },
+  "shot_info": {
+    "move": 2,
+    "width": 16,
+    "height": 16,
+    "directions": 1,
+    "frames": 4,
+    "frame_speed": 3,
+    "frame_sequence": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "speed": 1,
+    "size_x": 7,
+    "size_y": 7,
+    "strength": 10,
+    "health": 0,
+    "num_moves": 2,
+    "shot_type": 0,
+    "shot_pattern": 0,
+    "shots_allowed": 0,
+    "solid": 0,
+    "flying": 1,
+    "rating": 0,
+    "type": 3,
+    "name": "EGG",
+    "func_num": 0,
+    "func_pass": 0,
+    "magic_hurts": 0
+  },
+  "spritesheet": {
+    "frame_width": 16,
+    "frame_height": 16,
+    "columns": 10,
+    "rows": 2,
+    "actor_frames": 16,
+    "shot_frames": 4
+  }
+}

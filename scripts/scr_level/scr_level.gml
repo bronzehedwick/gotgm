@@ -6,17 +6,18 @@
 function level_load(level_index) {
     // Load episode data if not already loaded
     if (global.level_data == undefined) {
-        var _file = file_text_open_read("data/sdat" + string(global.current_episode) + ".json");
-        if (_file == -1) {
-            show_debug_message("ERROR: Could not load level data for episode " + string(global.current_episode));
+        var _path = "data/sdat" + string(global.current_episode) + ".json";
+        show_debug_message("Loading level data from: " + _path);
+
+        var _buf = buffer_load(_path);
+        if (_buf == -1) {
+            show_debug_message("ERROR: Could not load level data: " + _path);
             return;
         }
-        var _str = "";
-        while (!file_text_eof(_file)) {
-            _str += file_text_readln(_file);
-        }
-        file_text_close(_file);
+        var _str = buffer_read(_buf, buffer_string);
+        buffer_delete(_buf);
         global.level_data = json_parse(_str);
+        show_debug_message("Loaded " + string(array_length(global.level_data)) + " levels");
     }
 
     var _level = global.level_data[level_index];

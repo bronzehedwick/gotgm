@@ -1,13 +1,13 @@
 {
-  "$GMScript":"",
+  "$GMScript":"v1",
   "%Name":"scr_globals",
-  "resourceType":"GMScript",
-  "resourceVersion":"2.0",
-  "name":"scr_globals",
   "isCompatibility":false,
   "isDnD":false,
+  "name":"scr_globals",
   "parent":{
     "name":"Engine",
     "path":"folders/Scripts/Engine.yy",
   },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
 }

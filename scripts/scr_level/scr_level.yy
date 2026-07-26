@@ -1,13 +1,13 @@
 {
-  "$GMScript":"",
+  "$GMScript":"v1",
   "%Name":"scr_level",
-  "resourceType":"GMScript",
-  "resourceVersion":"2.0",
-  "name":"scr_level",
   "isCompatibility":false,
   "isDnD":false,
+  "name":"scr_level",
   "parent":{
     "name":"Level",
     "path":"folders/Scripts/Level.yy",
   },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
 }

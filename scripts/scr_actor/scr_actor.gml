@@ -60,17 +60,13 @@ function actor_get_definition(actor_type) {
 
     // Load from file
     var _path = "data/actors/actor" + _key + ".json";
-    if (!file_exists(_path)) {
+    var _buf = buffer_load(_path);
+    if (_buf == -1) {
         show_debug_message("WARNING: Actor definition not found: " + _path);
         return undefined;
     }
-
-    var _file = file_text_open_read(_path);
-    var _str = "";
-    while (!file_text_eof(_file)) {
-        _str += file_text_readln(_file);
-    }
-    file_text_close(_file);
+    var _str = buffer_read(_buf, buffer_string);
+    buffer_delete(_buf);
 
     var _data = json_parse(_str);
     var _info = _data.actor_info;

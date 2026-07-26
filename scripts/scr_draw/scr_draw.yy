@@ -1,13 +1,13 @@
 {
-  "$GMScript":"",
+  "$GMScript":"v1",
   "%Name":"scr_draw",
-  "resourceType":"GMScript",
-  "resourceVersion":"2.0",
-  "name":"scr_draw",
   "isCompatibility":false,
   "isDnD":false,
+  "name":"scr_draw",
   "parent":{
     "name":"Engine",
     "path":"folders/Scripts/Engine.yy",
   },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
 }

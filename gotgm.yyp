@@ -1,319 +1,357 @@
 {
-  "resourceType": "GMProject",
-  "resourceVersion": "2.0",
-  "name": "gotgm",
-  "AudioGroups": [
+  "$GMProject":"v1",
+  "%Name":"gotgm",
+  "resourceType":"GMProject",
+  "resourceVersion":"2.0",
+  "name":"gotgm",
+  "AudioGroups":[
     {
-      "resourceType": "GMAudioGroup",
-      "resourceVersion": "2.0",
-      "name": "audiogroup_default",
-      "targets": 461609314234257646
-    }
+      "$GMAudioGroup":"v1",
+      "%Name":"audiogroup_default",
+      "resourceType":"GMAudioGroup",
+      "resourceVersion":"2.0",
+      "name":"audiogroup_default",
+      "targets":461609314234257646,
+    },
   ],
-  "configs": {
-    "children": [],
-    "name": "Default"
+  "configs":{
+    "children":[],
+    "name":"Default",
   },
-  "defaultScriptType": 1,
-  "Folders": [
+  "defaultScriptType":1,
+  "Folders":[
     {
-      "resourceType": "GMFolder",
-      "resourceVersion": "1.0",
-      "name": "Sprites",
-      "folderPath": "folders/Sprites.yy"
+      "$GMFolder":"",
+      "%Name":"Sprites",
+      "resourceType":"GMFolder",
+      "resourceVersion":"1.0",
+      "name":"Sprites",
+      "folderPath":"folders/Sprites.yy",
     },
     {
-      "resourceType": "GMFolder",
-      "resourceVersion": "1.0",
-      "name": "Characters",
-      "folderPath": "folders/Sprites/Characters.yy"
+      "$GMFolder":"",
+      "%Name":"Characters",
+      "resourceType":"GMFolder",
+      "resourceVersion":"1.0",
+      "name":"Characters",
+      "folderPath":"folders/Sprites/Characters.yy",
     },
     {
-      "resourceType": "GMFolder",
-      "resourceVersion": "1.0",
-      "name": "Tiles",
-      "folderPath": "folders/Sprites/Tiles.yy"
+      "$GMFolder":"",
+      "%Name":"Tiles",
+      "resourceType":"GMFolder",
+      "resourceVersion":"1.0",
+      "name":"Tiles",
+      "folderPath":"folders/Sprites/Tiles.yy",
     },
     {
-      "resourceType": "GMFolder",
-      "resourceVersion": "1.0",
-      "name": "Objects",
-      "folderPath": "folders/Sprites/Objects.yy"
+      "$GMFolder":"",
+      "%Name":"Objects",
+      "resourceType":"GMFolder",
+      "resourceVersion":"1.0",
+      "name":"Objects",
+      "folderPath":"folders/Sprites/Objects.yy",
     },
     {
-      "resourceType": "GMFolder",
-      "resourceVersion": "1.0",
-      "name": "Enemies",
-      "folderPath": "folders/Sprites/Enemies.yy"
+      "$GMFolder":"",
+      "%Name":"Enemies",
+      "resourceType":"GMFolder",
+      "resourceVersion":"1.0",
+      "name":"Enemies",
+      "folderPath":"folders/Sprites/Enemies.yy",
     },
     {
-      "resourceType": "GMFolder",
-      "resourceVersion": "1.0",
-      "name": "UI",
-      "folderPath": "folders/Sprites/UI.yy"
+      "$GMFolder":"",
+      "%Name":"UI",
+      "resourceType":"GMFolder",
+      "resourceVersion":"1.0",
+      "name":"UI",
+      "folderPath":"folders/Sprites/UI.yy",
     },
     {
-      "resourceType": "GMFolder",
-      "resourceVersion": "1.0",
-      "name": "Objects",
-      "folderPath": "folders/Objects.yy"
+      "$GMFolder":"",
+      "%Name":"Objects",
+      "resourceType":"GMFolder",
+      "resourceVersion":"1.0",
+      "name":"Objects",
+      "folderPath":"folders/Objects.yy",
     },
     {
-      "resourceType": "GMFolder",
-      "resourceVersion": "1.0",
-      "name": "Engine",
-      "folderPath": "folders/Objects/Engine.yy"
+      "$GMFolder":"",
+      "%Name":"Engine",
+      "resourceType":"GMFolder",
+      "resourceVersion":"1.0",
+      "name":"Engine",
+      "folderPath":"folders/Objects/Engine.yy",
     },
     {
-      "resourceType": "GMFolder",
-      "resourceVersion": "1.0",
-      "name": "Actors",
-      "folderPath": "folders/Objects/Actors.yy"
+      "$GMFolder":"",
+      "%Name":"Actors",
+      "resourceType":"GMFolder",
+      "resourceVersion":"1.0",
+      "name":"Actors",
+      "folderPath":"folders/Objects/Actors.yy",
     },
     {
-      "resourceType": "GMFolder",
-      "resourceVersion": "1.0",
-      "name": "Items",
-      "folderPath": "folders/Objects/Items.yy"
+      "$GMFolder":"",
+      "%Name":"Items",
+      "resourceType":"GMFolder",
+      "resourceVersion":"1.0",
+      "name":"Items",
+      "folderPath":"folders/Objects/Items.yy",
     },
     {
-      "resourceType": "GMFolder",
-      "resourceVersion": "1.0",
-      "name": "Scripts",
-      "folderPath": "folders/Scripts.yy"
+      "$GMFolder":"",
+      "%Name":"Scripts",
+      "resourceType":"GMFolder",
+      "resourceVersion":"1.0",
+      "name":"Scripts",
+      "folderPath":"folders/Scripts.yy",
     },
     {
-      "resourceType": "GMFolder",
-      "resourceVersion": "1.0",
-      "name": "Engine",
-      "folderPath": "folders/Scripts/Engine.yy"
+      "$GMFolder":"",
+      "%Name":"Engine",
+      "resourceType":"GMFolder",
+      "resourceVersion":"1.0",
+      "name":"Engine",
+      "folderPath":"folders/Scripts/Engine.yy",
     },
     {
-      "resourceType": "GMFolder",
-      "resourceVersion": "1.0",
-      "name": "Actor",
-      "folderPath": "folders/Scripts/Actor.yy"
+      "$GMFolder":"",
+      "%Name":"Actor",
+      "resourceType":"GMFolder",
+      "resourceVersion":"1.0",
+      "name":"Actor",
+      "folderPath":"folders/Scripts/Actor.yy",
     },
     {
-      "resourceType": "GMFolder",
-      "resourceVersion": "1.0",
-      "name": "Level",
-      "folderPath": "folders/Scripts/Level.yy"
+      "$GMFolder":"",
+      "%Name":"Level",
+      "resourceType":"GMFolder",
+      "resourceVersion":"1.0",
+      "name":"Level",
+      "folderPath":"folders/Scripts/Level.yy",
     },
     {
-      "resourceType": "GMFolder",
-      "resourceVersion": "1.0",
-      "name": "Combat",
-      "folderPath": "folders/Scripts/Combat.yy"
+      "$GMFolder":"",
+      "%Name":"Combat",
+      "resourceType":"GMFolder",
+      "resourceVersion":"1.0",
+      "name":"Combat",
+      "folderPath":"folders/Scripts/Combat.yy",
     },
     {
-      "resourceType": "GMFolder",
-      "resourceVersion": "1.0",
-      "name": "Rooms",
-      "folderPath": "folders/Rooms.yy"
-    }
+      "$GMFolder":"",
+      "%Name":"Rooms",
+      "resourceType":"GMFolder",
+      "resourceVersion":"1.0",
+      "name":"Rooms",
+      "folderPath":"folders/Rooms.yy",
+    },
   ],
-  "IncludedFiles": [],
-  "isEcma": false,
-  "LibraryEmitters": [],
-  "MetaData": {
-    "IDEVersion": "2024.14.4.222"
+  "IncludedFiles":[],
+  "isEcma":false,
+  "LibraryEmitters":[],
+  "MetaData":{
+    "IDEVersion":"2024.14.4.222",
   },
-  "resources": [
+  "resources":[
     {
-      "id": {
-        "name": "spr_thor_down",
-        "path": "sprites/spr_thor_down/spr_thor_down.yy"
-      }
+      "id":{
+        "name":"spr_thor_down",
+        "path":"sprites/spr_thor_down/spr_thor_down.yy",
+      },
     },
     {
-      "id": {
-        "name": "spr_thor_up",
-        "path": "sprites/spr_thor_up/spr_thor_up.yy"
-      }
+      "id":{
+        "name":"spr_thor_up",
+        "path":"sprites/spr_thor_up/spr_thor_up.yy",
+      },
     },
     {
-      "id": {
-        "name": "spr_thor_left",
-        "path": "sprites/spr_thor_left/spr_thor_left.yy"
-      }
+      "id":{
+        "name":"spr_thor_left",
+        "path":"sprites/spr_thor_left/spr_thor_left.yy",
+      },
     },
     {
-      "id": {
-        "name": "spr_thor_right",
-        "path": "sprites/spr_thor_right/spr_thor_right.yy"
-      }
+      "id":{
+        "name":"spr_thor_right",
+        "path":"sprites/spr_thor_right/spr_thor_right.yy",
+      },
     },
     {
-      "id": {
-        "name": "spr_hammer_down",
-        "path": "sprites/spr_hammer_down/spr_hammer_down.yy"
-      }
+      "id":{
+        "name":"spr_hammer_down",
+        "path":"sprites/spr_hammer_down/spr_hammer_down.yy",
+      },
     },
     {
-      "id": {
-        "name": "spr_hammer_up",
-        "path": "sprites/spr_hammer_up/spr_hammer_up.yy"
-      }
+      "id":{
+        "name":"spr_hammer_up",
+        "path":"sprites/spr_hammer_up/spr_hammer_up.yy",
+      },
     },
     {
-      "id": {
-        "name": "spr_hammer_left",
-        "path": "sprites/spr_hammer_left/spr_hammer_left.yy"
-      }
+      "id":{
+        "name":"spr_hammer_left",
+        "path":"sprites/spr_hammer_left/spr_hammer_left.yy",
+      },
     },
     {
-      "id": {
-        "name": "spr_hammer_right",
-        "path": "sprites/spr_hammer_right/spr_hammer_right.yy"
-      }
+      "id":{
+        "name":"spr_hammer_right",
+        "path":"sprites/spr_hammer_right/spr_hammer_right.yy",
+      },
     },
     {
-      "id": {
-        "name": "spr_tileset_ep1",
-        "path": "sprites/spr_tileset_ep1/spr_tileset_ep1.yy"
-      }
+      "id":{
+        "name":"spr_tileset_ep1",
+        "path":"sprites/spr_tileset_ep1/spr_tileset_ep1.yy",
+      },
     },
     {
-      "id": {
-        "name": "spr_objects",
-        "path": "sprites/spr_objects/spr_objects.yy"
-      }
+      "id":{
+        "name":"spr_objects",
+        "path":"sprites/spr_objects/spr_objects.yy",
+      },
     },
     {
-      "id": {
-        "name": "spr_status_bar",
-        "path": "sprites/spr_status_bar/spr_status_bar.yy"
-      }
+      "id":{
+        "name":"spr_status_bar",
+        "path":"sprites/spr_status_bar/spr_status_bar.yy",
+      },
     },
     {
-      "id": {
-        "name": "spr_enemy_boingy",
-        "path": "sprites/spr_enemy_boingy/spr_enemy_boingy.yy"
-      }
+      "id":{
+        "name":"spr_enemy_boingy",
+        "path":"sprites/spr_enemy_boingy/spr_enemy_boingy.yy",
+      },
     },
     {
-      "id": {
-        "name": "spr_enemy_skunk",
-        "path": "sprites/spr_enemy_skunk/spr_enemy_skunk.yy"
-      }
+      "id":{
+        "name":"spr_enemy_skunk",
+        "path":"sprites/spr_enemy_skunk/spr_enemy_skunk.yy",
+      },
     },
     {
-      "id": {
-        "name": "spr_font",
-        "path": "sprites/spr_font/spr_font.yy"
-      }
+      "id":{
+        "name":"spr_font",
+        "path":"sprites/spr_font/spr_font.yy",
+      },
     },
     {
-      "id": {
-        "name": "scr_globals",
-        "path": "scripts/scr_globals/scr_globals.yy"
-      }
+      "id":{
+        "name":"scr_globals",
+        "path":"scripts/scr_globals/scr_globals.yy",
+      },
     },
     {
-      "id": {
-        "name": "scr_level",
-        "path": "scripts/scr_level/scr_level.yy"
-      }
+      "id":{
+        "name":"scr_level",
+        "path":"scripts/scr_level/scr_level.yy",
+      },
     },
     {
-      "id": {
-        "name": "scr_collision",
-        "path": "scripts/scr_collision/scr_collision.yy"
-      }
+      "id":{
+        "name":"scr_collision",
+        "path":"scripts/scr_collision/scr_collision.yy",
+      },
     },
     {
-      "id": {
-        "name": "scr_actor",
-        "path": "scripts/scr_actor/scr_actor.yy"
-      }
+      "id":{
+        "name":"scr_actor",
+        "path":"scripts/scr_actor/scr_actor.yy",
+      },
     },
     {
-      "id": {
-        "name": "scr_movement",
-        "path": "scripts/scr_movement/scr_movement.yy"
-      }
+      "id":{
+        "name":"scr_movement",
+        "path":"scripts/scr_movement/scr_movement.yy",
+      },
     },
     {
-      "id": {
-        "name": "scr_input",
-        "path": "scripts/scr_input/scr_input.yy"
-      }
+      "id":{
+        "name":"scr_input",
+        "path":"scripts/scr_input/scr_input.yy",
+      },
     },
     {
-      "id": {
-        "name": "scr_draw",
-        "path": "scripts/scr_draw/scr_draw.yy"
-      }
+      "id":{
+        "name":"scr_draw",
+        "path":"scripts/scr_draw/scr_draw.yy",
+      },
     },
     {
-      "id": {
-        "name": "scr_combat",
-        "path": "scripts/scr_combat/scr_combat.yy"
-      }
+      "id":{
+        "name":"scr_combat",
+        "path":"scripts/scr_combat/scr_combat.yy",
+      },
     },
     {
-      "id": {
-        "name": "obj_game",
-        "path": "objects/obj_game/obj_game.yy"
-      }
+      "id":{
+        "name":"obj_game",
+        "path":"objects/obj_game/obj_game.yy",
+      },
     },
     {
-      "id": {
-        "name": "obj_player",
-        "path": "objects/obj_player/obj_player.yy"
-      }
+      "id":{
+        "name":"obj_player",
+        "path":"objects/obj_player/obj_player.yy",
+      },
     },
     {
-      "id": {
-        "name": "obj_hammer",
-        "path": "objects/obj_hammer/obj_hammer.yy"
-      }
+      "id":{
+        "name":"obj_hammer",
+        "path":"objects/obj_hammer/obj_hammer.yy",
+      },
     },
     {
-      "id": {
-        "name": "obj_enemy",
-        "path": "objects/obj_enemy/obj_enemy.yy"
-      }
+      "id":{
+        "name":"obj_enemy",
+        "path":"objects/obj_enemy/obj_enemy.yy",
+      },
     },
     {
-      "id": {
-        "name": "obj_pickup",
-        "path": "objects/obj_pickup/obj_pickup.yy"
-      }
+      "id":{
+        "name":"obj_pickup",
+        "path":"objects/obj_pickup/obj_pickup.yy",
+      },
     },
     {
-      "id": {
-        "name": "rm_game",
-        "path": "rooms/rm_game/rm_game.yy"
-      }
-    }
+      "id":{
+        "name":"rm_game",
+        "path":"rooms/rm_game/rm_game.yy",
+      },
+    },
   ],
-  "RoomOrderNodes": [
+  "RoomOrderNodes":[
     {
-      "roomId": {
-        "name": "rm_game",
-        "path": "rooms/rm_game/rm_game.yy"
-      }
-    }
+      "roomId":{
+        "name":"rm_game",
+        "path":"rooms/rm_game/rm_game.yy",
+      },
+    },
   ],
-  "templateType": null,
-  "textureGroups": [
+  "templateType":null,
+  "textureGroups":[
     {
-      "resourceType": "GMTextureGroup",
-      "resourceVersion": "2.0",
-      "name": "Default",
-      "autocrop": true,
-      "border": 2,
-      "compressFormat": "bz2",
-      "directory": "",
-      "groupParent": null,
-      "isScaled": true,
-      "loadType": "default",
-      "mipsToGenerate": 0,
-      "targets": 461609314234257646,
-      "texturePageHeight": 2048,
-      "texturePageWidth": 2048
-    }
-  ]
+      "$GMTextureGroup":"",
+      "%Name":"Default",
+      "resourceType":"GMTextureGroup",
+      "resourceVersion":"2.0",
+      "name":"Default",
+      "autocrop":true,
+      "border":2,
+      "compressFormat":"bz2",
+      "directory":"",
+      "groupParent":null,
+      "isScaled":true,
+      "loadType":"default",
+      "mipsToGenerate":0,
+      "targets":461609314234257646,
+      "texturePageHeight":2048,
+      "texturePageWidth":2048,
+    },
+  ],
 }

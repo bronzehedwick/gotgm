@@ -1,11 +1,13 @@
 {
-  "resourceType": "GMScript",
-  "resourceVersion": "2.0",
-  "name": "scr_level",
-  "isCompatibility": false,
-  "isDnD": false,
-  "parent": {
-    "name": "Level",
-    "path": "folders/Scripts/Level.yy"
-  }
+  "$GMScript":"",
+  "%Name":"scr_level",
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+  "name":"scr_level",
+  "isCompatibility":false,
+  "isDnD":false,
+  "parent":{
+    "name":"Level",
+    "path":"folders/Scripts/Level.yy",
+  },
 }

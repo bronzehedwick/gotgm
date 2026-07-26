@@ -1,11 +1,13 @@
 {
-  "resourceType": "GMScript",
-  "resourceVersion": "2.0",
-  "name": "scr_combat",
-  "isCompatibility": false,
-  "isDnD": false,
-  "parent": {
-    "name": "Combat",
-    "path": "folders/Scripts/Combat.yy"
-  }
+  "$GMScript":"",
+  "%Name":"scr_combat",
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+  "name":"scr_combat",
+  "isCompatibility":false,
+  "isDnD":false,
+  "parent":{
+    "name":"Combat",
+    "path":"folders/Scripts/Combat.yy",
+  },
 }

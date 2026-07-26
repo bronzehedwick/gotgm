@@ -1,308 +1,235 @@
 {
-  "resourceType": "GMSprite",
-  "resourceVersion": "2.0",
-  "name": "spr_hammer_down",
-  "bbox_bottom": 15,
-  "bbox_left": 0,
-  "bbox_right": 15,
-  "bbox_top": 0,
-  "bboxMode": 0,
-  "collisionKind": 1,
-  "collisionTolerance": 0,
-  "DynamicTexturePage": false,
-  "edgeFiltering": false,
-  "For3D": false,
-  "frames": [
+  "$GMSprite":"v2",
+  "%Name":"spr_hammer_down",
+  "resourceType":"GMSprite",
+  "resourceVersion":"2.0",
+  "name":"spr_hammer_down",
+  "bbox_bottom":15,
+  "bbox_left":0,
+  "bbox_right":15,
+  "bbox_top":0,
+  "bboxMode":0,
+  "collisionKind":1,
+  "collisionTolerance":0,
+  "DynamicTexturePage":false,
+  "edgeFiltering":false,
+  "For3D":false,
+  "frames":[
     {
-      "resourceType": "GMSpriteFrame",
-      "resourceVersion": "2.0",
-      "name": "0cb9d792-a5a1-4041-8c20-2b891039119d",
-      "compositeImage": {
-        "resourceType": "GMSpriteImage",
-        "resourceVersion": "2.0",
-        "name": "",
-        "FrameId": {
-          "name": "0cb9d792-a5a1-4041-8c20-2b891039119d",
-          "path": "sprites/spr_hammer_down/spr_hammer_down.yy"
-        },
-        "LayerId": null
-      },
-      "images": [
-        {
-          "resourceType": "GMSpriteImage",
-          "resourceVersion": "2.0",
-          "name": "",
-          "FrameId": {
-            "name": "0cb9d792-a5a1-4041-8c20-2b891039119d",
-            "path": "sprites/spr_hammer_down/spr_hammer_down.yy"
-          },
-          "LayerId": {
-            "name": "03f3e1e7-1499-49c6-b7f6-1ad971507287",
-            "path": "sprites/spr_hammer_down/spr_hammer_down.yy"
-          }
-        }
-      ]
+      "$GMSpriteFrame":"v1",
+      "%Name":"0cb9d792-a5a1-4041-8c20-2b891039119d",
+      "name":"0cb9d792-a5a1-4041-8c20-2b891039119d",
+      "resourceType":"GMSpriteFrame",
+      "resourceVersion":"2.0",
     },
     {
-      "resourceType": "GMSpriteFrame",
-      "resourceVersion": "2.0",
-      "name": "09328008-079c-44e5-b296-09b9bc1d24ac",
-      "compositeImage": {
-        "resourceType": "GMSpriteImage",
-        "resourceVersion": "2.0",
-        "name": "",
-        "FrameId": {
-          "name": "09328008-079c-44e5-b296-09b9bc1d24ac",
-          "path": "sprites/spr_hammer_down/spr_hammer_down.yy"
-        },
-        "LayerId": null
-      },
-      "images": [
-        {
-          "resourceType": "GMSpriteImage",
-          "resourceVersion": "2.0",
-          "name": "",
-          "FrameId": {
-            "name": "09328008-079c-44e5-b296-09b9bc1d24ac",
-            "path": "sprites/spr_hammer_down/spr_hammer_down.yy"
-          },
-          "LayerId": {
-            "name": "03f3e1e7-1499-49c6-b7f6-1ad971507287",
-            "path": "sprites/spr_hammer_down/spr_hammer_down.yy"
-          }
-        }
-      ]
+      "$GMSpriteFrame":"v1",
+      "%Name":"09328008-079c-44e5-b296-09b9bc1d24ac",
+      "name":"09328008-079c-44e5-b296-09b9bc1d24ac",
+      "resourceType":"GMSpriteFrame",
+      "resourceVersion":"2.0",
     },
     {
-      "resourceType": "GMSpriteFrame",
-      "resourceVersion": "2.0",
-      "name": "edd89da0-d760-4948-a406-6477373b4902",
-      "compositeImage": {
-        "resourceType": "GMSpriteImage",
-        "resourceVersion": "2.0",
-        "name": "",
-        "FrameId": {
-          "name": "edd89da0-d760-4948-a406-6477373b4902",
-          "path": "sprites/spr_hammer_down/spr_hammer_down.yy"
-        },
-        "LayerId": null
-      },
-      "images": [
-        {
-          "resourceType": "GMSpriteImage",
-          "resourceVersion": "2.0",
-          "name": "",
-          "FrameId": {
-            "name": "edd89da0-d760-4948-a406-6477373b4902",
-            "path": "sprites/spr_hammer_down/spr_hammer_down.yy"
-          },
-          "LayerId": {
-            "name": "03f3e1e7-1499-49c6-b7f6-1ad971507287",
-            "path": "sprites/spr_hammer_down/spr_hammer_down.yy"
-          }
-        }
-      ]
+      "$GMSpriteFrame":"v1",
+      "%Name":"edd89da0-d760-4948-a406-6477373b4902",
+      "name":"edd89da0-d760-4948-a406-6477373b4902",
+      "resourceType":"GMSpriteFrame",
+      "resourceVersion":"2.0",
     },
     {
-      "resourceType": "GMSpriteFrame",
-      "resourceVersion": "2.0",
-      "name": "83f0c826-4f3e-4dc4-867c-9ad1084729ba",
-      "compositeImage": {
-        "resourceType": "GMSpriteImage",
-        "resourceVersion": "2.0",
-        "name": "",
-        "FrameId": {
-          "name": "83f0c826-4f3e-4dc4-867c-9ad1084729ba",
-          "path": "sprites/spr_hammer_down/spr_hammer_down.yy"
-        },
-        "LayerId": null
-      },
-      "images": [
-        {
-          "resourceType": "GMSpriteImage",
-          "resourceVersion": "2.0",
-          "name": "",
-          "FrameId": {
-            "name": "83f0c826-4f3e-4dc4-867c-9ad1084729ba",
-            "path": "sprites/spr_hammer_down/spr_hammer_down.yy"
-          },
-          "LayerId": {
-            "name": "03f3e1e7-1499-49c6-b7f6-1ad971507287",
-            "path": "sprites/spr_hammer_down/spr_hammer_down.yy"
-          }
-        }
-      ]
-    }
+      "$GMSpriteFrame":"v1",
+      "%Name":"83f0c826-4f3e-4dc4-867c-9ad1084729ba",
+      "name":"83f0c826-4f3e-4dc4-867c-9ad1084729ba",
+      "resourceType":"GMSpriteFrame",
+      "resourceVersion":"2.0",
+    },
   ],
-  "gridX": 0,
-  "gridY": 0,
-  "height": 16,
-  "HTile": false,
-  "layers": [
+  "gridX":0,
+  "gridY":0,
+  "height":16,
+  "HTile":false,
+  "layers":[
     {
-      "resourceType": "GMImageLayer",
-      "resourceVersion": "2.0",
-      "name": "03f3e1e7-1499-49c6-b7f6-1ad971507287",
-      "blendMode": 0,
-      "displayName": "default",
-      "isLocked": false,
-      "opacity": 100.0,
-      "visible": true
-    }
+      "$GMImageLayer":"",
+      "%Name":"03f3e1e7-1499-49c6-b7f6-1ad971507287",
+      "resourceType":"GMImageLayer",
+      "resourceVersion":"2.0",
+      "name":"03f3e1e7-1499-49c6-b7f6-1ad971507287",
+      "blendMode":0,
+      "displayName":"default",
+      "isLocked":false,
+      "opacity":100.0,
+      "visible":true,
+    },
   ],
-  "nineSlice": null,
-  "origin": 0,
-  "parent": {
-    "name": "Characters",
-    "path": "folders/Sprites/Characters.yy"
+  "nineSlice":null,
+  "origin":0,
+  "parent":{
+    "name":"Characters",
+    "path":"folders/Sprites/Characters.yy",
   },
-  "preMultiplyAlpha": false,
-  "sequence": {
-    "resourceType": "GMSequence",
-    "resourceVersion": "2.0",
-    "name": "spr_hammer_down",
-    "autoRecord": true,
-    "backdropHeight": 768,
-    "backdropImageOpacity": 0.5,
-    "backdropImagePath": "",
-    "backdropWidth": 1366,
-    "backdropXOffset": 0.0,
-    "backdropYOffset": 0.0,
-    "events": {
-      "resourceType": "KeyframeStore<MessageEventKeyframe>",
-      "resourceVersion": "2.0",
-      "Keyframes": []
+  "preMultiplyAlpha":false,
+  "sequence":{
+    "$GMSequence":"v1",
+    "%Name":"spr_hammer_down",
+    "resourceType":"GMSequence",
+    "resourceVersion":"2.0",
+    "name":"spr_hammer_down",
+    "autoRecord":true,
+    "backdropHeight":768,
+    "backdropImageOpacity":0.5,
+    "backdropImagePath":"",
+    "backdropWidth":1366,
+    "backdropXOffset":0.0,
+    "backdropYOffset":0.0,
+    "events":{
+      "$KeyframeStore<MessageEventKeyframe>":"",
+      "resourceType":"KeyframeStore<MessageEventKeyframe>",
+      "resourceVersion":"2.0",
+      "Keyframes":[],
     },
-    "eventStubScript": null,
-    "eventToFunction": {},
-    "length": 4.0,
-    "lockOrigin": false,
-    "moments": {
-      "resourceType": "KeyframeStore<MomentsEventKeyframe>",
-      "resourceVersion": "2.0",
-      "Keyframes": []
+    "eventStubScript":null,
+    "eventToFunction":{},
+    "length":4.0,
+    "lockOrigin":false,
+    "moments":{
+      "$KeyframeStore<MomentsEventKeyframe>":"",
+      "resourceType":"KeyframeStore<MomentsEventKeyframe>",
+      "resourceVersion":"2.0",
+      "Keyframes":[],
     },
-    "playback": 1,
-    "playbackSpeed": 8.0,
-    "playbackSpeedType": 0,
-    "showBackdrop": true,
-    "showBackdropImage": false,
-    "timeUnits": 1,
-    "tracks": [
+    "playback":1,
+    "playbackSpeed":8.0,
+    "playbackSpeedType":0,
+    "showBackdrop":true,
+    "showBackdropImage":false,
+    "timeUnits":1,
+    "tracks":[
       {
-        "resourceType": "GMSpriteFramesTrack",
-        "resourceVersion": "2.0",
-        "name": "frames",
-        "builtinName": 0,
-        "events": [],
-        "inheritsTrackColour": true,
-        "interpolation": 1,
-        "isCreationTrack": false,
-        "keyframes": {
-          "resourceType": "KeyframeStore<SpriteFrameKeyframe>",
-          "resourceVersion": "2.0",
-          "Keyframes": [
+        "$GMSpriteFramesTrack":"",
+        "%Name":"frames",
+        "resourceType":"GMSpriteFramesTrack",
+        "resourceVersion":"2.0",
+        "name":"frames",
+        "builtinName":0,
+        "events":[],
+        "inheritsTrackColour":true,
+        "interpolation":1,
+        "isCreationTrack":false,
+        "keyframes":{
+          "$KeyframeStore<SpriteFrameKeyframe>":"",
+          "resourceType":"KeyframeStore<SpriteFrameKeyframe>",
+          "resourceVersion":"2.0",
+          "Keyframes":[
             {
-              "resourceType": "Keyframe<SpriteFrameKeyframe>",
-              "resourceVersion": "2.0",
-              "Channels": {
-                "0": {
-                  "resourceType": "SpriteFrameKeyframe",
-                  "resourceVersion": "2.0",
-                  "Id": {
-                    "name": "0cb9d792-a5a1-4041-8c20-2b891039119d",
-                    "path": "sprites/spr_hammer_down/spr_hammer_down.yy"
-                  }
-                }
+              "$Keyframe<SpriteFrameKeyframe>":"",
+              "resourceType":"Keyframe<SpriteFrameKeyframe>",
+              "resourceVersion":"2.0",
+              "Channels":{
+                "0":{
+                  "$SpriteFrameKeyframe":"",
+                  "resourceType":"SpriteFrameKeyframe",
+                  "resourceVersion":"2.0",
+                  "Id":{
+                    "name":"0cb9d792-a5a1-4041-8c20-2b891039119d",
+                    "path":"sprites/spr_hammer_down/spr_hammer_down.yy",
+                  },
+                },
               },
-              "Disabled": false,
-              "id": "5277749e-69a1-40ff-88cf-f9cd89378ec1",
-              "IsCreationKey": false,
-              "Key": 0.0,
-              "Length": 1.0,
-              "Stretch": false
+              "Disabled":false,
+              "id":"5277749e-69a1-40ff-88cf-f9cd89378ec1",
+              "IsCreationKey":false,
+              "Key":0.0,
+              "Length":1.0,
+              "Stretch":false,
             },
             {
-              "resourceType": "Keyframe<SpriteFrameKeyframe>",
-              "resourceVersion": "2.0",
-              "Channels": {
-                "0": {
-                  "resourceType": "SpriteFrameKeyframe",
-                  "resourceVersion": "2.0",
-                  "Id": {
-                    "name": "09328008-079c-44e5-b296-09b9bc1d24ac",
-                    "path": "sprites/spr_hammer_down/spr_hammer_down.yy"
-                  }
-                }
+              "$Keyframe<SpriteFrameKeyframe>":"",
+              "resourceType":"Keyframe<SpriteFrameKeyframe>",
+              "resourceVersion":"2.0",
+              "Channels":{
+                "0":{
+                  "$SpriteFrameKeyframe":"",
+                  "resourceType":"SpriteFrameKeyframe",
+                  "resourceVersion":"2.0",
+                  "Id":{
+                    "name":"09328008-079c-44e5-b296-09b9bc1d24ac",
+                    "path":"sprites/spr_hammer_down/spr_hammer_down.yy",
+                  },
+                },
               },
-              "Disabled": false,
-              "id": "c65d317b-a4ca-4f4c-a0c2-ad367c31eeed",
-              "IsCreationKey": false,
-              "Key": 1.0,
-              "Length": 1.0,
-              "Stretch": false
+              "Disabled":false,
+              "id":"c65d317b-a4ca-4f4c-a0c2-ad367c31eeed",
+              "IsCreationKey":false,
+              "Key":1.0,
+              "Length":1.0,
+              "Stretch":false,
             },
             {
-              "resourceType": "Keyframe<SpriteFrameKeyframe>",
-              "resourceVersion": "2.0",
-              "Channels": {
-                "0": {
-                  "resourceType": "SpriteFrameKeyframe",
-                  "resourceVersion": "2.0",
-                  "Id": {
-                    "name": "edd89da0-d760-4948-a406-6477373b4902",
-                    "path": "sprites/spr_hammer_down/spr_hammer_down.yy"
-                  }
-                }
+              "$Keyframe<SpriteFrameKeyframe>":"",
+              "resourceType":"Keyframe<SpriteFrameKeyframe>",
+              "resourceVersion":"2.0",
+              "Channels":{
+                "0":{
+                  "$SpriteFrameKeyframe":"",
+                  "resourceType":"SpriteFrameKeyframe",
+                  "resourceVersion":"2.0",
+                  "Id":{
+                    "name":"edd89da0-d760-4948-a406-6477373b4902",
+                    "path":"sprites/spr_hammer_down/spr_hammer_down.yy",
+                  },
+                },
               },
-              "Disabled": false,
-              "id": "7a0584af-4832-4d6b-8ce1-f9927409a9e4",
-              "IsCreationKey": false,
-              "Key": 2.0,
-              "Length": 1.0,
-              "Stretch": false
+              "Disabled":false,
+              "id":"7a0584af-4832-4d6b-8ce1-f9927409a9e4",
+              "IsCreationKey":false,
+              "Key":2.0,
+              "Length":1.0,
+              "Stretch":false,
             },
             {
-              "resourceType": "Keyframe<SpriteFrameKeyframe>",
-              "resourceVersion": "2.0",
-              "Channels": {
-                "0": {
-                  "resourceType": "SpriteFrameKeyframe",
-                  "resourceVersion": "2.0",
-                  "Id": {
-                    "name": "83f0c826-4f3e-4dc4-867c-9ad1084729ba",
-                    "path": "sprites/spr_hammer_down/spr_hammer_down.yy"
-                  }
-                }
+              "$Keyframe<SpriteFrameKeyframe>":"",
+              "resourceType":"Keyframe<SpriteFrameKeyframe>",
+              "resourceVersion":"2.0",
+              "Channels":{
+                "0":{
+                  "$SpriteFrameKeyframe":"",
+                  "resourceType":"SpriteFrameKeyframe",
+                  "resourceVersion":"2.0",
+                  "Id":{
+                    "name":"83f0c826-4f3e-4dc4-867c-9ad1084729ba",
+                    "path":"sprites/spr_hammer_down/spr_hammer_down.yy",
+                  },
+                },
               },
-              "Disabled": false,
-              "id": "1ca8f1b6-ba71-4393-81d0-097ba73d8dd2",
-              "IsCreationKey": false,
-              "Key": 3.0,
-              "Length": 1.0,
-              "Stretch": false
-            }
-          ]
+              "Disabled":false,
+              "id":"1ca8f1b6-ba71-4393-81d0-097ba73d8dd2",
+              "IsCreationKey":false,
+              "Key":3.0,
+              "Length":1.0,
+              "Stretch":false,
+            },
+          ],
         },
-        "modifiers": [],
-        "spriteId": null,
-        "trackColour": 0,
-        "tracks": [],
-        "traits": 0
-      }
+        "modifiers":[],
+        "spriteId":null,
+        "trackColour":0,
+        "tracks":[],
+        "traits":0,
+      },
     ],
-    "visibleRange": null,
-    "volume": 1.0,
-    "xorigin": 0,
-    "yorigin": 0
+    "visibleRange":null,
+    "volume":1.0,
+    "xorigin":0,
+    "yorigin":0,
   },
-  "swatchColours": null,
-  "swfPrecision": 0.5,
-  "textureGroupId": {
-    "name": "Default",
-    "path": "texturegroups/Default"
+  "swatchColours":null,
+  "swfPrecision":0.5,
+  "textureGroupId":{
+    "name":"Default",
+    "path":"texturegroups/Default",
   },
-  "type": 0,
-  "VTile": false,
-  "width": 16
+  "type":0,
+  "VTile":false,
+  "width":16,
 }

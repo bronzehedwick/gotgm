@@ -145,6 +145,42 @@ function tile_is_special(tile_id) {
     return (tile_id > TILE_SPECIAL);
 }
 
+
+/// @description Original special_tile rules used by enemies and NPCs.
+function special_tile_enemy(tile_id, is_flying) {
+    switch (tile_id) {
+        case 205:
+        case 206:
+        case 207:
+        case 208:
+            return true;
+        case 209:
+        case 210:
+            return false;
+        case 224:
+        case 225:
+        case 226:
+        case 227:
+            return is_flying;
+    }
+
+    switch (global.current_episode) {
+        case 1:
+            if (tile_id >= 201 && tile_id <= 204) return false;
+            if (tile_id >= 214 && tile_id <= 217) return false;
+            break;
+        case 2:
+            if (tile_id >= 201 && tile_id <= 203) return false;
+            if (tile_id == 204 || tile_id == 211) return true;
+            if (tile_id >= 212 && tile_id <= 216) return false;
+            break;
+        case 3:
+            if (tile_id >= 201 && tile_id <= 204) return false;
+            if (tile_id == 211 || tile_id == 212) return false;
+            break;
+    }
+    return true;
+}
 /// @function level_set_tile(grid_x, grid_y, original_tile)
 /// @description Change an editor-owned foreground cell and its collision value
 function level_set_tile(grid_x, grid_y, original_tile) {

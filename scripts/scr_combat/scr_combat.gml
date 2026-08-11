@@ -121,24 +121,22 @@ function combat_enemy_hit(enemy_inst, damage) {
         enemy_inst.vulnerable_timer = 10;
         return;
     }
-    with (enemy_inst) {
-    if (global.difficulty == 0) damage *= 2;
-    else if (global.difficulty == 2) damage = damage div 2;
+    var _scaled_damage = damage;
+    if (global.difficulty == 0) _scaled_damage *= 2;
+    else if (global.difficulty == 2) _scaled_damage = _scaled_damage div 2;
 
-        if (vulnerable_timer > 0 || is_dead) return;
+    if (enemy_inst.vulnerable_timer > 0 || enemy_inst.is_dead) return;
 
-        audio_play_sound(snd_got_punch, 1, false);
-        health -= damage;
-
-        vulnerable_timer = 20;
-        if (health <= 0) {
-            is_dead = true;
-            if (variable_instance_exists(id, "actor_def") && actor_def != undefined) {
-                global.score = min(global.score + actor_def.rating, MAX_SCORE);
-            }
-            instance_destroy();
-            combat_drop_loot(id);
+    audio_play_sound(snd_got_punch, 1, false);
+    enemy_inst.health -= _scaled_damage;
+    enemy_inst.vulnerable_timer = 20;
+    if (enemy_inst.health <= 0) {
+        enemy_inst.is_dead = true;
+        if (enemy_inst.actor_def != undefined) {
+            global.score = min(global.score + enemy_inst.actor_def.rating, MAX_SCORE);
         }
+        combat_drop_loot(enemy_inst);
+        with (enemy_inst) instance_destroy();
     }
 }
 

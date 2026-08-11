@@ -71,6 +71,24 @@ if (!returning) {
 
 sprite_index = dir_sprites[facing];
 
-var _hit = instance_place(x, y, obj_enemy);
-if (_hit != noone) combat_enemy_hit(_hit, damage);
-if (_hit != noone && !returning) returning = true;
+// check_move1 in the DOS game uses a fixed 10x10 hammer rectangle and checks
+// every overlapping actor. A single instance_place could select an adjacent
+// invulnerable globe instead of the boingy that was visibly struck.
+var _hit_any = false;
+var _hx1 = x + 1;
+var _hy1 = y + 1;
+var _hx2 = x + 10;
+var _hy2 = y + 10;
+for (var _i = 0; _i < instance_number(obj_enemy); _i++) {
+    var _hit = instance_find(obj_enemy, _i);
+    if (_hit == noone || !_hit.visible || _hit.is_dead) continue;
+    var _ex1 = _hit.x;
+    var _ey1 = _hit.y;
+    var _ex2 = _hit.x + _hit.col_w - 1;
+    var _ey2 = _hit.y + _hit.col_h - 1;
+    if (_hx1 <= _ex2 && _hx2 >= _ex1 && _hy1 <= _ey2 && _hy2 >= _ey1) {
+        combat_enemy_hit(_hit, damage);
+        _hit_any = true;
+    }
+}
+if (_hit_any && !returning) returning = true;

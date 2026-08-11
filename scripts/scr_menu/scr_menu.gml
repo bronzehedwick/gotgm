@@ -11,6 +11,9 @@ function menu_init() {
         selection: 0,
         status: "",
         status_timer: 0,
+        story_phase: 0,
+        story_scroll: 0,
+        story_delay: 0,
     };
 }
 
@@ -111,10 +114,20 @@ function menu_new_game() {
         health: MAX_HEALTH, magic: 0, jewels: 0, keys: 0, score: 0,
         selected_item: 0, quest_object: 0, inventory_json: "{}",
     };
-    global.menu.active = false;
-    global.menu.mode = "none";
+    global.menu.active = true;
+    global.menu.mode = "story";
+    global.menu.options = [];
+    global.menu.story_phase = 0;
+    global.menu.story_scroll = 0;
+    global.menu.story_delay = 60;
     var _start = level_room_asset(1, 23);
     if (_start != -1) room_goto(_start);
+}
+
+function menu_finish_story() {
+    global.menu.active = false;
+    global.menu.mode = "none";
+    music_enter_room();
 }
 
 function menu_back() {
@@ -206,6 +219,39 @@ function menu_update() {
     if (_m.status_timer > 0) _m.status_timer--;
     else _m.status = "";
 
+    if (_m.mode == "story") {
+        if (keyboard_check_pressed(vk_escape)) {
+            menu_finish_story();
+            return;
+        }
+        if (_m.story_delay > 0) {
+            _m.story_delay--;
+            return;
+        }
+
+        var _advance = keyboard_check_pressed(vk_anykey);
+        switch (_m.story_phase) {
+            case 0: // first page waits for a response
+                if (_advance) _m.story_phase = 1;
+                break;
+            case 1: // scroll the VGA display start down one scanline per tick
+                if (_advance) {
+                    _m.story_phase = 3;
+                } else {
+                    _m.story_scroll = min(240, _m.story_scroll + 1);
+                    if (_m.story_scroll >= 240) _m.story_phase = 2;
+                }
+                break;
+            case 2: // second page waits before gameplay begins
+                if (_advance) menu_finish_story();
+                break;
+            case 3: // a response during the scroll pauses until another response
+                if (_advance) _m.story_phase = 1;
+                break;
+        }
+        return;
+    }
+
     if (_m.mode == "help") {
         if (keyboard_check_pressed(vk_escape) || keyboard_check_pressed(vk_enter)
         || keyboard_check_pressed(vk_space)) menu_back();
@@ -277,6 +323,11 @@ function menu_draw_help() {
 
 function menu_draw() {
     var _m=global.menu;if(!_m.active)return;
+    if(_m.mode=="story"){
+        draw_sprite_part(spr_story_ep1,0,0,floor(_m.story_scroll),320,240,0,0);
+        return;
+    }
+
     if(_m.mode=="title"){
         draw_set_colour(c_black);draw_rectangle(0,0,319,239,false);
         draw_original_text_colour("GOD OF THUNDER",104,2,dialogue_markup_colour(0),true);

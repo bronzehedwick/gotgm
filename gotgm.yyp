@@ -930,6 +930,7 @@
     {"id":{"name":"spr_shot_110","path":"sprites/spr_shot_110/spr_shot_110.yy",},},
     {"id":{"name":"spr_shot_113","path":"sprites/spr_shot_113/spr_shot_113.yy",},},
     {"id":{"name":"spr_status_bar","path":"sprites/spr_status_bar/spr_status_bar.yy",},},
+    {"id":{"name":"spr_story_ep1","path":"sprites/spr_story_ep1/spr_story_ep1.yy",},},
     {"id":{"name":"spr_thor_down","path":"sprites/spr_thor_down/spr_thor_down.yy",},},
     {"id":{"name":"spr_thor_left","path":"sprites/spr_thor_left/spr_thor_left.yy",},},
     {"id":{"name":"spr_thor_right","path":"sprites/spr_thor_right/spr_thor_right.yy",},},

@@ -165,6 +165,7 @@ function check_move_enemy(ex, ey, ew, eh, dx, dy, is_flying) {
             if (_tid < 0) return false;
             if (tile_is_solid(_tid)) return false;
             if (!is_flying && tile_is_fly_only(_tid)) return false;
+            if (tile_is_special(_tid) && !special_tile_enemy(_tid, is_flying)) return false;
         }
     }
     return true;

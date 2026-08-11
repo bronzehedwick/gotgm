@@ -36,6 +36,7 @@ from extract_gotres import (  # noqa: E402
     GotArchive,
     decode_pic_block,
     indexed_image,
+    deplane,
     palette_from_resource,
 )
 
@@ -49,6 +50,7 @@ GENERATED_PREFIXES = (
     "spr_pickup_",
     "spr_face_",
     "spr_dialogue_odin",
+    "spr_story_",
     "snd_got_",
     "spr_tiles_ep",
     "ts_ep",
@@ -466,6 +468,105 @@ def create_dialogue_resources(
     )
     resources.append("spr_dialogue_odin")
     return resources
+
+def _story_palette(data: bytes) -> list[tuple[int, int, int, int]]:
+    """Expand the story's six-bit VGA palette to ordinary RGBA."""
+    if len(data) != 256 * 3:
+        raise ValueError("STORYPAL must contain 256 VGA RGB triplets")
+    return [
+        tuple(round(component * 255 / 63) for component in data[index:index + 3]) + (255,)
+        for index in range(0, len(data), 3)
+    ]
+
+
+def _story_planar_image(
+    data: bytes,
+    palette: list[tuple[int, int, int, int]],
+    transparent: bool,
+) -> Image.Image:
+    width_in_plane, height, _transparent_index = struct.unpack_from("<HHH", data)
+    width = width_in_plane * 4
+    return indexed_image(
+        width, height, deplane(data[6:], width, height), palette, transparent
+    )
+
+
+def create_story_resources(archive: GotArchive) -> list[str]:
+    """Rebuild the exact two-page Episode 1 opening used by story()."""
+    palette = _story_palette(archive.read("STORYPAL"))
+    canvas = Image.new("RGBA", (320, 480), palette[0])
+
+    for index in range(12):
+        strip = _story_planar_image(
+            archive.read(f"OPENP{index + 1}"), palette, transparent=False
+        )
+        canvas.alpha_composite(strip, (0, index * 40))
+
+    pictures = archive.read("STORYPIC")
+    picture_frames = [
+        decode_pic_block(
+            pictures[offset:offset + PIC_BLOCK_SIZE],
+            palette,
+        )
+        for offset in range(0, len(pictures), PIC_BLOCK_SIZE)
+    ]
+    canvas.alpha_composite(picture_frames[0], (146, 64))
+    canvas.alpha_composite(picture_frames[1], (24, 328))
+
+    font = archive.read("TEXT")
+    glyph_masks: list[Image.Image] = []
+    for offset in range(0, len(font), 72):
+        pixels = deplane(font[offset:offset + 72], 8, 9)
+        mask = Image.new("L", (8, 9))
+        mask.putdata([255 if value not in (0, 15) else 0 for value in pixels])
+        glyph_masks.append(mask)
+
+    def draw_glyph(character: int, x: int, y: int, colour: int) -> None:
+        glyph_index = character - 32
+        if glyph_index < 0 or glyph_index >= len(glyph_masks):
+            return
+        mask = glyph_masks[glyph_index]
+        fill = Image.new("RGBA", (8, 9), palette[colour])
+        canvas.paste(fill, (x, y), mask)
+
+    story = archive.read("STORY1")
+    pointer = 0
+    line = 0
+    x = 8
+    y = 2
+    colour = 72
+    while pointer < len(story) and line < 46:
+        character = story[pointer]
+        if character == 13:
+            x = 8
+            line += 1
+            y = 2 + line * 10
+        elif (
+            character == ord("/")
+            and pointer + 4 < len(story)
+            and story[pointer + 4] == ord("/")
+        ):
+            colour = int(story[pointer + 1:pointer + 4].decode("ascii"))
+            pointer += 4
+        elif character != 10:
+            for shadow_x, shadow_y in (
+                (-1, -1), (1, 1), (-1, 1), (1, -1),
+                (0, -1), (0, 1), (-1, 0), (1, 0),
+            ):
+                draw_glyph(character, x + shadow_x, y + shadow_y, 255)
+            draw_glyph(character, x, y, colour)
+            x += 8
+        pointer += 1
+
+    name = "spr_story_ep1"
+    frame_image_resource(
+        name,
+        [canvas],
+        folder_ref("UI", "folders/Sprites/UI.yy"),
+        playback_speed=0.0,
+    )
+    return [name]
+
 
 def create_actor_resources(archive: GotArchive,
                            palette: list[tuple[int, int, int, int]]) -> tuple[dict[int, str], list[str]]:
@@ -907,6 +1008,9 @@ def main() -> None:
 
     sound_resources = create_sound_resources(archive)
     generated_names.extend(sound_resources)
+
+    story_resources = create_story_resources(archive)
+    generated_names.extend(story_resources)
 
     dialogue_resources = create_dialogue_resources(archive, palette)
     generated_names.extend(dialogue_resources)

@@ -1,7 +1,8 @@
 # God of Thunder -- editable GameMaker restoration
 
 Open `gotgm.yyp` in GameMaker and press Run. The project starts at an
-original-style opening menu, then begins Episode 1 on screen 23.
+original-style opening menu, plays the original Episode 1 story sequence, then
+begins Episode 1 on screen 23.
 
 ## Editing the game
 
@@ -55,8 +56,8 @@ your edited rooms.
 
 `tools/extract_gotres.py` decodes `GOTRES.DAT`.
 `tools/generate_editable_resources.py` deterministically rebuilds the 360
-rooms, original actor/pickup/shot sprites, dialogue sources and portraits, sound
-effects, and tile sets.
+rooms, original actor/pickup/shot/story sprites, dialogue sources and portraits,
+sound effects, and tile sets.
 
 Running the full generator overwrites generated rooms and original imported
 resources, so do not rerun it after making room-editor or dialogue-source
@@ -85,7 +86,8 @@ Implemented and compiling in GameMaker 2024.14:
 - six inventory items with original costs/timing (tornado/thunder visuals are
   currently simplified)
 - all 16 original digitized sound effects and the original music tracks
-- original-style opening/options menus, music controls, skill setting, help, and JSON save/load
+- original-style opening/options menus, the original Episode 1 scrolling story,
+  music controls, skill setting, help, and JSON save/load
 - the original framed dialogue presentation, palette text colours, Odin portrait, and input separation
 - all three original conversation/quest banks, including speech pages, choices,
   numeric/string variables, branching, subroutines, loops, flags, quest items,
@@ -94,5 +96,5 @@ Implemented and compiling in GameMaker 2024.14:
 Still incomplete compared with the published DOS game:
 
 - exact boss phase choreography, status presentation, and closing sequences
-- exact opening/story/end sequences beyond the functional opening menu
+- exact ending and closing sequences
 - dedicated tornado/thunder presentation and a few less-used projectile details

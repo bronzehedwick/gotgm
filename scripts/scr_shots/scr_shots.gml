@@ -56,7 +56,10 @@ function enemy_shot_line_clear(shooter, dir, flying) {
 function enemy_spawn_shot(shooter, dir, ignore_walls) {
     if (!instance_exists(shooter)) return noone;
     var _type = shooter.shot_type;
-    if (_type <= 0 || _type >= 100) return noone;
+    // A zero shot_type means the projectile is embedded in the shooter's own
+    // ACTOR resource (the underground spider is the first common example).
+    if (_type == 0) _type = shooter.actor_type_id;
+    if (_type < 0 || _type >= 100) return noone;
     if (enemy_shot_count(shooter.id) >= shooter.shots_allowed) return noone;
 
     var _def = shot_get_definition(_type);

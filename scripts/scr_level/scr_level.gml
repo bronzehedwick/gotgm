@@ -66,6 +66,17 @@ function level_enter_current_room() {
     }
 
     music_enter_room();
+    var _boss_key = "boss_" + string(_episode) + "_" + string(_level_index);
+    if (struct_exists(global.flags, _boss_key)) {
+        with (obj_enemy) {
+            if ((actor_type_id >= 22 && actor_type_id <= 25)
+            || (actor_type_id >= 31 && actor_type_id <= 34)
+            || (actor_type_id >= 64 && actor_type_id <= 67)) {
+                instance_destroy();
+            }
+        }
+    }
+
     global.last_room = room;
 
 }

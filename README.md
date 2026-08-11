@@ -77,6 +77,11 @@ Implemented and compiling in GameMaker 2024.14:
   episode-specific special tiles
 - returning hammer, combat damage, enemy firing, common original movement
   patterns, pickups, persistent collected items, checkpoint respawn
+- original pushable blocks, recharge angels, switches, rolling boulders and
+  directional barrels, wall-following spinballs, and multipart troll movement
+- all episode-specific dialogue `EXEC` helpers, including mining, arrest
+  transfer, randomized charges, and the Episode 1 troll step-aside event
+- functional multipart snake, skull, and Loki encounters with persistent defeat state
 - six inventory items with original costs/timing (tornado/thunder visuals are
   currently simplified)
 - all 16 original digitized sound effects and the original music tracks
@@ -88,8 +93,6 @@ Implemented and compiling in GameMaker 2024.14:
 
 Still incomplete compared with the published DOS game:
 
-- a small set of executable-specific `EXEC` quest helpers needs exact
-  episode-specific translation (the generic script language is implemented)
-- bosses and several bespoke multi-part actor routines
+- exact boss phase choreography, status presentation, and closing sequences
 - exact opening/story/end sequences beyond the functional opening menu
 - dedicated tornado/thunder presentation and a few less-used projectile details

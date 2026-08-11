@@ -198,6 +198,8 @@ function shot_step_motion() {
             return life_timer > 0 && x > -shot_w;
 
         case 4:
+            life_timer--;
+            if (life_timer <= 0) return false;
             if (global.player == noone || !instance_exists(global.player)) return false;
             var _dx = clamp(global.player.x - x, -2, 2);
             var _dy = clamp(global.player.y - y, -2, 2);
@@ -240,6 +242,82 @@ function shot_step_motion() {
             velocity_x = 2 * _dx / _length;
             velocity_y = 2 * _dy / _length;
             return shot_try_move(velocity_x, velocity_y);
+
+        case 12: // Loki pod: aim at Thor, then ricochet after reaching an edge
+            if (velocity_x == 0 && velocity_y == 0) {
+                var _distance = max(1, point_distance(x, y, angle_target_x, angle_target_y));
+                velocity_x = 2 * (angle_target_x - x) / _distance;
+                velocity_y = 2 * (angle_target_y - y) / _distance;
+            }
+            x += velocity_x;
+            y += velocity_y;
+            if (x < 16 || x > 287 || y < 16 || y > 159) {
+                angle_target_x = irandom(SCREEN_W - 1);
+                angle_target_y = irandom(SCREEN_H - 1);
+                var _new_distance = max(1, point_distance(x, y, angle_target_x, angle_target_y));
+                velocity_x = 2 * (angle_target_x - x) / _new_distance;
+                velocity_y = 2 * (angle_target_y - y) / _new_distance;
+                shot_move = 13;
+                life_timer = 240;
+                current_frame = min(2, array_length(shot_sequence) - 1);
+            }
+            return true;
+
+        case 13: // Loki pod ricochet phase
+            life_timer--;
+            x += velocity_x;
+            y += velocity_y;
+            if (x < 16 || x > 287) {
+                x = clamp(x, 16, 287);
+                velocity_x = -velocity_x;
+            }
+            if (y < 16 || y > 159) {
+                y = clamp(y, 16, 159);
+                velocity_y = -velocity_y;
+    }
+            return life_timer > 0;
     }
     return false;
+}
+
+/// @description Bosses store their projectile definition alongside their own
+/// actor record instead of referencing a separate shot_type.
+function enemy_spawn_embedded_shot(shooter, source_actor_type) {
+    if (!instance_exists(shooter)) return noone;
+    if (enemy_shot_count(shooter.id) >= shooter.shots_allowed) return noone;
+    var _def = shot_get_definition(source_actor_type);
+    if (_def == undefined) return noone;
+
+    var _shot = instance_create_layer(shooter.x, shooter.y, "Actors", obj_enemy_shot);
+    with (_shot) {
+        creator_id = shooter.id;
+        shot_type = source_actor_type;
+        shot_def = _def;
+        shot_move = _def.move;
+        shot_speed = max(1, _def.speed);
+        shot_num_moves = max(1, _def.num_moves);
+        shot_flying = (_def.flying > 0);
+        shot_strength = _def.strength;
+        shot_w = max(1, _def.size_x);
+        shot_h = max(1, _def.size_y);
+        shot_directions = max(1, _def.directions);
+        shot_frames = max(1, _def.frames);
+        shot_frame_speed = max(1, _def.frame_speed);
+        shot_sequence = _def.frame_sequence;
+        facing = shooter.facing;
+        speed_count = 0;
+        frame_count = 0;
+        current_frame = 0;
+        sprite_index = asset_get_index(shot_sprite_name(source_actor_type));
+        image_speed = 0;
+        x = shooter.x + (shooter.col_w - shot_w) * 0.5;
+        y = shooter.y + (shooter.col_h - shot_h) * 0.5;
+        angle_target_x = global.player.x;
+        angle_target_y = global.player.y;
+        velocity_x = 0;
+        velocity_y = 0;
+        life_timer = 240;
+    }
+    shooter.shot_cooldown = 60;
+    return _shot;
 }

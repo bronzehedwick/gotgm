@@ -1,6 +1,7 @@
 /// @description Enemy update
 if (global.menu.active) exit;
 if (dialogue_cooldown > 0) dialogue_cooldown--;
+if (special_cooldown > 0) special_cooldown--;
 if (dialogue_contact_latched
 && (global.player == noone || !instance_exists(global.player) || !place_meeting(x, y, obj_player))) {
     dialogue_contact_latched = false;

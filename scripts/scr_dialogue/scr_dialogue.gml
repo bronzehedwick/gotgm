@@ -126,7 +126,79 @@ function dialogue_sound(n){
  snd_got_angel,snd_got_woop,snd_got_dead,snd_got_braapp,snd_got_wind,snd_got_punch,snd_got_clang,snd_got_explode];
  if(n>=1&&n<=16)audio_play_sound(_a[n-1],2,false);
 }
+function dialogue_execute_hook_restored(n){
+ var _d=global.dialogue;
+ if(_d.episode==1&&n==5){
+  // The troll steps two whole tiles left after accepting the shrub.
+  for(var _slot=3;_slot<=6;_slot++){
+   var _part=movement_actor_slot(_slot);
+   if(_part!=noone)_part.x-=32;
+  }
+  var _leader=movement_actor_slot(3);
+  if(_leader!=noone)_leader.boss_timer=16;
+  return true;
+ }
+ if(_d.episode==2&&n==3){
+  // Pickaxe helper: only crystal tiles 174..178 can be excavated.
+  if(global.player==noone||!instance_exists(global.player))return true;
+  var _p=(((global.player.y+8)div 16)*20)+((global.player.x+7)div 16);
+  var _x=_p mod 20,_y=_p div 20;
+  if(_x<0||_x>=GRID_COLS||_y<0||_y>=GRID_ROWS){
+   dialogue_sound(12);
+   return true;
+  }
+  var _tile=tile_get(_x,_y);
+  if(_tile<174||_tile>178){
+   dialogue_sound(12);
+   return true;
+  }
+  _d.vars[0]=1;
+  dialogue_sound(10);
+  if(global.current_level==106&&_p==69){
+   dialogue_place_tile(global.current_level,_p,220);
+   return true;
+  }
+  dialogue_place_tile(global.current_level,_p,191);
+  var _occupied=false;
+  for(var _i=0;_i<instance_number(obj_pickup);_i++){
+   var _pickup=instance_find(obj_pickup,_i);
+   if(_pickup!=noone&&round(_pickup.x)==_x*16&&round(_pickup.y)==_y*16){
+    _occupied=true;
+    break;
+   }
+  }
+  var _forced=(global.current_level==13&&_p==150
+   &&!struct_exists(global.flags,"26")&&struct_exists(global.flags,"28"));
+  if(!_occupied&&(irandom(99)<25||_forced)){
+   pickup_spawn(_forced?20:irandom_range(1,5),_x*16,_y*16);
+  }
+  return true;
+ }
+ if(_d.episode==3&&n==1){
+  dialogue_sound(8);
+  if(global.player!=noone&&instance_exists(global.player)){
+   global.player.x=240;
+   global.player.y=158;
+   global.player.invulnerable_timer=60;
+   var _target=level_room_asset(3,109);
+   if(_target!=-1)room_goto(_target);
+  }
+  return true;
+ }
+ if(_d.episode==3&&n==2){
+  var _offense=["Cussing","Rebellion","Kissing Your Mother Goodbye",
+   "Being a Thunder God","Door-to-Door Sales","Carrying a Concealed Hammer"];
+  var _reason=["We heard you say 'Booger'.","You look kind of rebellious.",
+   "Your mother turned you in.","We don't want you here.",
+   "Nobody wants your sweepers.","That's a dangerous weapon."];
+  var _choice=irandom(array_length(_offense)-1);
+  _d.strings[0]=_offense[_choice];_d.strings[1]=_reason[_choice];
+  return true;
+ }
+ return false;
+}
 function dialogue_execute_hook(n){
+ if(dialogue_execute_hook_restored(n))return;
  var _d=global.dialogue;if(_d.episode==3&&n==2){var _a=["Cussing","Rebellion","Kissing Your Mother Goodbye",
  "Being a Thunder God","Door-to-Door Sales","Carrying a Concealed Hammer"];
  var _b=["The law is the law.","No excuses are accepted.","You should have known better.","Orders are orders."];

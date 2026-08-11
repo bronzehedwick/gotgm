@@ -73,3 +73,4 @@ sprite_index = dir_sprites[facing];
 
 var _hit = instance_place(x, y, obj_enemy);
 if (_hit != noone) combat_enemy_hit(_hit, damage);
+if (_hit != noone && !returning) returning = true;

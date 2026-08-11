@@ -51,6 +51,16 @@ function game_init() {
     global.quest_object = 0;
     global.flags = {};
     global.tile_overrides = {};
+    global.demo_active = false;
+    global.demo_data = -1;
+    global.demo_index = 0;
+    global.demo_up = false;
+    global.demo_down = false;
+    global.demo_left = false;
+    global.demo_right = false;
+    global.demo_fire = false;
+    global.demo_magic = false;
+
     dialogue_init();
     music_init();
     menu_init();

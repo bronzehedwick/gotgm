@@ -127,6 +127,18 @@ function combat_enemy_hit(enemy_inst, damage) {
 
     if (enemy_inst.vulnerable_timer > 0 || enemy_inst.is_dead) return;
 
+    // Older placed actor children can reach combat without a local health
+    // variable. Restore it from the original actor definition on first hit.
+    if (!variable_instance_exists(enemy_inst, "health")) {
+        var _starting_health = 10;
+        if (variable_instance_exists(enemy_inst, "actor_def")
+        && is_struct(enemy_inst.actor_def)
+        && variable_struct_exists(enemy_inst.actor_def, "health")) {
+            _starting_health = enemy_inst.actor_def.health;
+        }
+        enemy_inst.health = _starting_health;
+    }
+
     audio_play_sound(snd_got_punch, 1, false);
     enemy_inst.health -= _scaled_damage;
     enemy_inst.vulnerable_timer = 20;

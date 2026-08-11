@@ -491,8 +491,8 @@ def _story_planar_image(
     )
 
 
-def create_story_resources(archive: GotArchive) -> list[str]:
-    """Rebuild the exact two-page Episode 1 opening used by story()."""
+def _create_story_resource(archive: GotArchive, episode: int) -> list[str]:
+    """Rebuild one exact two-page episode opening used by story()."""
     palette = _story_palette(archive.read("STORYPAL"))
     canvas = Image.new("RGBA", (320, 480), palette[0])
 
@@ -529,7 +529,7 @@ def create_story_resources(archive: GotArchive) -> list[str]:
         fill = Image.new("RGBA", (8, 9), palette[colour])
         canvas.paste(fill, (x, y), mask)
 
-    story = archive.read("STORY1")
+    story = archive.read(f"STORY{episode}")
     pointer = 0
     line = 0
     x = 8
@@ -558,7 +558,7 @@ def create_story_resources(archive: GotArchive) -> list[str]:
             x += 8
         pointer += 1
 
-    name = "spr_story_ep1"
+    name = f"spr_story_ep{episode}"
     frame_image_resource(
         name,
         [canvas],
@@ -566,6 +566,14 @@ def create_story_resources(archive: GotArchive) -> list[str]:
         playback_speed=0.0,
     )
     return [name]
+
+
+def create_story_resources(archive: GotArchive) -> list[str]:
+    """Rebuild the exact two-page openings for all three episodes."""
+    resources: list[str] = []
+    for episode in (1, 2, 3):
+        resources.extend(_create_story_resource(archive, episode))
+    return resources
 
 
 def create_actor_resources(archive: GotArchive,
@@ -1007,6 +1015,9 @@ def main() -> None:
         generated_names.extend((sprite_name, tileset_name))
 
     sound_resources = create_sound_resources(archive)
+
+    demo_path = PROJECT_DIR / "datafiles" / "data" / "demo.got"
+    demo_path.write_bytes(archive.read("DEMO"))
     generated_names.extend(sound_resources)
 
     story_resources = create_story_resources(archive)

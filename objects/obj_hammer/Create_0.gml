@@ -1,10 +1,12 @@
 /// @description Hammer initialization
 facing = Dir.DOWN;
 move_speed = 4;
-lifetime = 60; // max frames before returning
+returning = false;
+outbound_timer = 45;
+return_axis_toggle = false;
 damage = 10;
 
-// Sprite arrays
+// Sprite arrays follow the original UP, DOWN, LEFT, RIGHT direction order.
 dir_sprites = [
     spr_hammer_down,
     spr_hammer_up,

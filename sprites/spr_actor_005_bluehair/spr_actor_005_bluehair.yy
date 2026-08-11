@@ -1,0 +1,466 @@
+{
+  "$GMSprite": "v2",
+  "%Name": "spr_actor_005_bluehair",
+  "bboxMode": 0,
+  "bbox_bottom": 15,
+  "bbox_left": 0,
+  "bbox_right": 15,
+  "bbox_top": 0,
+  "collisionKind": 1,
+  "collisionTolerance": 0,
+  "DynamicTexturePage": false,
+  "edgeFiltering": false,
+  "For3D": false,
+  "frames": [
+    {
+      "$GMSpriteFrame": "v1",
+      "%Name": "d0c47756-d181-5839-8209-e8b267190b94",
+      "name": "d0c47756-d181-5839-8209-e8b267190b94",
+      "resourceType": "GMSpriteFrame",
+      "resourceVersion": "2.0"
+    },
+    {
+      "$GMSpriteFrame": "v1",
+      "%Name": "cd3427b1-7aab-5ab5-85d0-ea8639e870a2",
+      "name": "cd3427b1-7aab-5ab5-85d0-ea8639e870a2",
+      "resourceType": "GMSpriteFrame",
+      "resourceVersion": "2.0"
+    },
+    {
+      "$GMSpriteFrame": "v1",
+      "%Name": "aab9f833-2117-51fb-8a76-aec62c2e3242",
+      "name": "aab9f833-2117-51fb-8a76-aec62c2e3242",
+      "resourceType": "GMSpriteFrame",
+      "resourceVersion": "2.0"
+    },
+    {
+      "$GMSpriteFrame": "v1",
+      "%Name": "26a4332c-eeb3-5e92-ac53-c8178a7bdecc",
+      "name": "26a4332c-eeb3-5e92-ac53-c8178a7bdecc",
+      "resourceType": "GMSpriteFrame",
+      "resourceVersion": "2.0"
+    },
+    {
+      "$GMSpriteFrame": "v1",
+      "%Name": "53408b1f-f52e-5570-b750-794219f4574d",
+      "name": "53408b1f-f52e-5570-b750-794219f4574d",
+      "resourceType": "GMSpriteFrame",
+      "resourceVersion": "2.0"
+    },
+    {
+      "$GMSpriteFrame": "v1",
+      "%Name": "4ea48bc4-c5af-5294-8f47-c48946fee2b9",
+      "name": "4ea48bc4-c5af-5294-8f47-c48946fee2b9",
+      "resourceType": "GMSpriteFrame",
+      "resourceVersion": "2.0"
+    },
+    {
+      "$GMSpriteFrame": "v1",
+      "%Name": "65096464-188f-5a5b-a484-ec92236fa321",
+      "name": "65096464-188f-5a5b-a484-ec92236fa321",
+      "resourceType": "GMSpriteFrame",
+      "resourceVersion": "2.0"
+    },
+    {
+      "$GMSpriteFrame": "v1",
+      "%Name": "d65fe1f8-293c-5066-8c08-8e10f98a4d3e",
+      "name": "d65fe1f8-293c-5066-8c08-8e10f98a4d3e",
+      "resourceType": "GMSpriteFrame",
+      "resourceVersion": "2.0"
+    },
+    {
+      "$GMSpriteFrame": "v1",
+      "%Name": "52e77159-d11c-557c-b426-dc055de58d76",
+      "name": "52e77159-d11c-557c-b426-dc055de58d76",
+      "resourceType": "GMSpriteFrame",
+      "resourceVersion": "2.0"
+    },
+    {
+      "$GMSpriteFrame": "v1",
+      "%Name": "9ccc1477-cab2-5405-b26d-e53d9aea2817",
+      "name": "9ccc1477-cab2-5405-b26d-e53d9aea2817",
+      "resourceType": "GMSpriteFrame",
+      "resourceVersion": "2.0"
+    },
+    {
+      "$GMSpriteFrame": "v1",
+      "%Name": "254e70f3-e719-5df7-b0c8-bc96d4c5ddf7",
+      "name": "254e70f3-e719-5df7-b0c8-bc96d4c5ddf7",
+      "resourceType": "GMSpriteFrame",
+      "resourceVersion": "2.0"
+    },
+    {
+      "$GMSpriteFrame": "v1",
+      "%Name": "ea26cb69-6d0e-5e59-9556-1bb99b47bfe9",
+      "name": "ea26cb69-6d0e-5e59-9556-1bb99b47bfe9",
+      "resourceType": "GMSpriteFrame",
+      "resourceVersion": "2.0"
+    }
+  ],
+  "gridX": 0,
+  "gridY": 0,
+  "height": 16,
+  "HTile": false,
+  "layers": [
+    {
+      "$GMImageLayer": "",
+      "%Name": "9492b9ad-2646-52e0-97f4-61271dd2343f",
+      "blendMode": 0,
+      "displayName": "default",
+      "isLocked": false,
+      "name": "9492b9ad-2646-52e0-97f4-61271dd2343f",
+      "opacity": 100.0,
+      "resourceType": "GMImageLayer",
+      "resourceVersion": "2.0",
+      "visible": true
+    }
+  ],
+  "name": "spr_actor_005_bluehair",
+  "nineSlice": null,
+  "origin": 0,
+  "parent": {
+    "name": "Original Actors",
+    "path": "folders/Sprites/Original Actors.yy"
+  },
+  "preMultiplyAlpha": false,
+  "resourceType": "GMSprite",
+  "resourceVersion": "2.0",
+  "sequence": {
+    "$GMSequence": "v1",
+    "%Name": "spr_actor_005_bluehair",
+    "autoRecord": true,
+    "backdropHeight": 768,
+    "backdropImageOpacity": 0.5,
+    "backdropImagePath": "",
+    "backdropWidth": 1366,
+    "backdropXOffset": 0.0,
+    "backdropYOffset": 0.0,
+    "events": {
+      "$KeyframeStore<MessageEventKeyframe>": "",
+      "Keyframes": [],
+      "resourceType": "KeyframeStore<MessageEventKeyframe>",
+      "resourceVersion": "2.0"
+    },
+    "eventStubScript": null,
+    "eventToFunction": {},
+    "length": 12.0,
+    "lockOrigin": false,
+    "moments": {
+      "$KeyframeStore<MomentsEventKeyframe>": "",
+      "Keyframes": [],
+      "resourceType": "KeyframeStore<MomentsEventKeyframe>",
+      "resourceVersion": "2.0"
+    },
+    "name": "spr_actor_005_bluehair",
+    "playback": 1,
+    "playbackSpeed": 0.0,
+    "playbackSpeedType": 0,
+    "resourceType": "GMSequence",
+    "resourceVersion": "2.0",
+    "showBackdrop": true,
+    "showBackdropImage": false,
+    "timeUnits": 1,
+    "tracks": [
+      {
+        "$GMSpriteFramesTrack": "",
+        "builtinName": 0,
+        "events": [],
+        "inheritsTrackColour": true,
+        "interpolation": 1,
+        "isCreationTrack": false,
+        "keyframes": {
+          "$KeyframeStore<SpriteFrameKeyframe>": "",
+          "Keyframes": [
+            {
+              "$Keyframe<SpriteFrameKeyframe>": "",
+              "Channels": {
+                "0": {
+                  "$SpriteFrameKeyframe": "",
+                  "Id": {
+                    "name": "d0c47756-d181-5839-8209-e8b267190b94",
+                    "path": "sprites/spr_actor_005_bluehair/spr_actor_005_bluehair.yy"
+                  },
+                  "resourceType": "SpriteFrameKeyframe",
+                  "resourceVersion": "2.0"
+                }
+              },
+              "Disabled": false,
+              "id": "cc4a1fe6-e3e0-5fb7-ac44-59c2a3e4b445",
+              "IsCreationKey": false,
+              "Key": 0.0,
+              "Length": 1.0,
+              "resourceType": "Keyframe<SpriteFrameKeyframe>",
+              "resourceVersion": "2.0",
+              "Stretch": false
+            },
+            {
+              "$Keyframe<SpriteFrameKeyframe>": "",
+              "Channels": {
+                "0": {
+                  "$SpriteFrameKeyframe": "",
+                  "Id": {
+                    "name": "cd3427b1-7aab-5ab5-85d0-ea8639e870a2",
+                    "path": "sprites/spr_actor_005_bluehair/spr_actor_005_bluehair.yy"
+                  },
+                  "resourceType": "SpriteFrameKeyframe",
+                  "resourceVersion": "2.0"
+                }
+              },
+              "Disabled": false,
+              "id": "8b9a31de-317a-56b6-92be-3eefb4747f12",
+              "IsCreationKey": false,
+              "Key": 1.0,
+              "Length": 1.0,
+              "resourceType": "Keyframe<SpriteFrameKeyframe>",
+              "resourceVersion": "2.0",
+              "Stretch": false
+            },
+            {
+              "$Keyframe<SpriteFrameKeyframe>": "",
+              "Channels": {
+                "0": {
+                  "$SpriteFrameKeyframe": "",
+                  "Id": {
+                    "name": "aab9f833-2117-51fb-8a76-aec62c2e3242",
+                    "path": "sprites/spr_actor_005_bluehair/spr_actor_005_bluehair.yy"
+                  },
+                  "resourceType": "SpriteFrameKeyframe",
+                  "resourceVersion": "2.0"
+                }
+              },
+              "Disabled": false,
+              "id": "d6ad2d16-ff30-5107-b0f0-6182b12d44d2",
+              "IsCreationKey": false,
+              "Key": 2.0,
+              "Length": 1.0,
+              "resourceType": "Keyframe<SpriteFrameKeyframe>",
+              "resourceVersion": "2.0",
+              "Stretch": false
+            },
+            {
+              "$Keyframe<SpriteFrameKeyframe>": "",
+              "Channels": {
+                "0": {
+                  "$SpriteFrameKeyframe": "",
+                  "Id": {
+                    "name": "26a4332c-eeb3-5e92-ac53-c8178a7bdecc",
+                    "path": "sprites/spr_actor_005_bluehair/spr_actor_005_bluehair.yy"
+                  },
+                  "resourceType": "SpriteFrameKeyframe",
+                  "resourceVersion": "2.0"
+                }
+              },
+              "Disabled": false,
+              "id": "a6978e22-5fed-5354-aca1-75450036f449",
+              "IsCreationKey": false,
+              "Key": 3.0,
+              "Length": 1.0,
+              "resourceType": "Keyframe<SpriteFrameKeyframe>",
+              "resourceVersion": "2.0",
+              "Stretch": false
+            },
+            {
+              "$Keyframe<SpriteFrameKeyframe>": "",
+              "Channels": {
+                "0": {
+                  "$SpriteFrameKeyframe": "",
+                  "Id": {
+                    "name": "53408b1f-f52e-5570-b750-794219f4574d",
+                    "path": "sprites/spr_actor_005_bluehair/spr_actor_005_bluehair.yy"
+                  },
+                  "resourceType": "SpriteFrameKeyframe",
+                  "resourceVersion": "2.0"
+                }
+              },
+              "Disabled": false,
+              "id": "340833c1-71d1-5946-b208-5dc9647a6be2",
+              "IsCreationKey": false,
+              "Key": 4.0,
+              "Length": 1.0,
+              "resourceType": "Keyframe<SpriteFrameKeyframe>",
+              "resourceVersion": "2.0",
+              "Stretch": false
+            },
+            {
+              "$Keyframe<SpriteFrameKeyframe>": "",
+              "Channels": {
+                "0": {
+                  "$SpriteFrameKeyframe": "",
+                  "Id": {
+                    "name": "4ea48bc4-c5af-5294-8f47-c48946fee2b9",
+                    "path": "sprites/spr_actor_005_bluehair/spr_actor_005_bluehair.yy"
+                  },
+                  "resourceType": "SpriteFrameKeyframe",
+                  "resourceVersion": "2.0"
+                }
+              },
+              "Disabled": false,
+              "id": "3886b419-9b5e-5e93-a878-27ea969dd90d",
+              "IsCreationKey": false,
+              "Key": 5.0,
+              "Length": 1.0,
+              "resourceType": "Keyframe<SpriteFrameKeyframe>",
+              "resourceVersion": "2.0",
+              "Stretch": false
+            },
+            {
+              "$Keyframe<SpriteFrameKeyframe>": "",
+              "Channels": {
+                "0": {
+                  "$SpriteFrameKeyframe": "",
+                  "Id": {
+                    "name": "65096464-188f-5a5b-a484-ec92236fa321",
+                    "path": "sprites/spr_actor_005_bluehair/spr_actor_005_bluehair.yy"
+                  },
+                  "resourceType": "SpriteFrameKeyframe",
+                  "resourceVersion": "2.0"
+                }
+              },
+              "Disabled": false,
+              "id": "09cb3dd8-dbca-551e-97e0-99f7243fddd1",
+              "IsCreationKey": false,
+              "Key": 6.0,
+              "Length": 1.0,
+              "resourceType": "Keyframe<SpriteFrameKeyframe>",
+              "resourceVersion": "2.0",
+              "Stretch": false
+            },
+            {
+              "$Keyframe<SpriteFrameKeyframe>": "",
+              "Channels": {
+                "0": {
+                  "$SpriteFrameKeyframe": "",
+                  "Id": {
+                    "name": "d65fe1f8-293c-5066-8c08-8e10f98a4d3e",
+                    "path": "sprites/spr_actor_005_bluehair/spr_actor_005_bluehair.yy"
+                  },
+                  "resourceType": "SpriteFrameKeyframe",
+                  "resourceVersion": "2.0"
+                }
+              },
+              "Disabled": false,
+              "id": "a0c8faba-a11f-598c-90ab-1e1677400d76",
+              "IsCreationKey": false,
+              "Key": 7.0,
+              "Length": 1.0,
+              "resourceType": "Keyframe<SpriteFrameKeyframe>",
+              "resourceVersion": "2.0",
+              "Stretch": false
+            },
+            {
+              "$Keyframe<SpriteFrameKeyframe>": "",
+              "Channels": {
+                "0": {
+                  "$SpriteFrameKeyframe": "",
+                  "Id": {
+                    "name": "52e77159-d11c-557c-b426-dc055de58d76",
+                    "path": "sprites/spr_actor_005_bluehair/spr_actor_005_bluehair.yy"
+                  },
+                  "resourceType": "SpriteFrameKeyframe",
+                  "resourceVersion": "2.0"
+                }
+              },
+              "Disabled": false,
+              "id": "fcde59e9-46d1-569d-846f-c11fbd674fc9",
+              "IsCreationKey": false,
+              "Key": 8.0,
+              "Length": 1.0,
+              "resourceType": "Keyframe<SpriteFrameKeyframe>",
+              "resourceVersion": "2.0",
+              "Stretch": false
+            },
+            {
+              "$Keyframe<SpriteFrameKeyframe>": "",
+              "Channels": {
+                "0": {
+                  "$SpriteFrameKeyframe": "",
+                  "Id": {
+                    "name": "9ccc1477-cab2-5405-b26d-e53d9aea2817",
+                    "path": "sprites/spr_actor_005_bluehair/spr_actor_005_bluehair.yy"
+                  },
+                  "resourceType": "SpriteFrameKeyframe",
+                  "resourceVersion": "2.0"
+                }
+              },
+              "Disabled": false,
+              "id": "1de8810e-1f79-5560-8e8b-e3840df660e2",
+              "IsCreationKey": false,
+              "Key": 9.0,
+              "Length": 1.0,
+              "resourceType": "Keyframe<SpriteFrameKeyframe>",
+              "resourceVersion": "2.0",
+              "Stretch": false
+            },
+            {
+              "$Keyframe<SpriteFrameKeyframe>": "",
+              "Channels": {
+                "0": {
+                  "$SpriteFrameKeyframe": "",
+                  "Id": {
+                    "name": "254e70f3-e719-5df7-b0c8-bc96d4c5ddf7",
+                    "path": "sprites/spr_actor_005_bluehair/spr_actor_005_bluehair.yy"
+                  },
+                  "resourceType": "SpriteFrameKeyframe",
+                  "resourceVersion": "2.0"
+                }
+              },
+              "Disabled": false,
+              "id": "46362ffb-dbcd-512f-b8b6-2fb756d9518d",
+              "IsCreationKey": false,
+              "Key": 10.0,
+              "Length": 1.0,
+              "resourceType": "Keyframe<SpriteFrameKeyframe>",
+              "resourceVersion": "2.0",
+              "Stretch": false
+            },
+            {
+              "$Keyframe<SpriteFrameKeyframe>": "",
+              "Channels": {
+                "0": {
+                  "$SpriteFrameKeyframe": "",
+                  "Id": {
+                    "name": "ea26cb69-6d0e-5e59-9556-1bb99b47bfe9",
+                    "path": "sprites/spr_actor_005_bluehair/spr_actor_005_bluehair.yy"
+                  },
+                  "resourceType": "SpriteFrameKeyframe",
+                  "resourceVersion": "2.0"
+                }
+              },
+              "Disabled": false,
+              "id": "a6dd89e5-4a34-5070-b5db-ccfad9dbe37f",
+              "IsCreationKey": false,
+              "Key": 11.0,
+              "Length": 1.0,
+              "resourceType": "Keyframe<SpriteFrameKeyframe>",
+              "resourceVersion": "2.0",
+              "Stretch": false
+            }
+          ],
+          "resourceType": "KeyframeStore<SpriteFrameKeyframe>",
+          "resourceVersion": "2.0"
+        },
+        "modifiers": [],
+        "name": "frames",
+        "resourceType": "GMSpriteFramesTrack",
+        "resourceVersion": "2.0",
+        "spriteId": null,
+        "trackColour": 0,
+        "tracks": [],
+        "traits": 0
+      }
+    ],
+    "visibleRange": null,
+    "volume": 1.0,
+    "xorigin": 0,
+    "yorigin": 0
+  },
+  "swatchColours": null,
+  "swfPrecision": 0.5,
+  "textureGroupId": {
+    "name": "Default",
+    "path": "texturegroups/Default"
+  },
+  "type": 0,
+  "VTile": false,
+  "width": 16
+}

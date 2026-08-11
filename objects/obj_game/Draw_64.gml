@@ -1,27 +1,41 @@
-/// @description Draw HUD
-var _scale = 4; // GUI scale for visibility
+/// @description Original 320x48 status panel
+var _panel_y = SCREEN_H;
+draw_sprite(spr_status_bar, 0, 0, _panel_y);
 
-draw_set_colour(c_black);
-draw_rectangle(0, 0, display_get_gui_width(), 60 * _scale, false);
+if (global.selected_item >= 1 && global.selected_item <= 6) {
+    var _pickup_number = global.selected_item + 26;
+    var _item_sprite = asset_get_index("spr_pickup_" + string(_pickup_number));
+    if (_item_sprite != -1) draw_sprite(_item_sprite, 0, 280, _panel_y + 4);
+}
+
+// Original PANEL.C bar coordinates and palette colours.
+var _health_end = 59 + clamp(global.health, 0, MAX_HEALTH);
+draw_set_colour(make_colour_rgb(255, 0, 0));
+draw_rectangle(59, _panel_y + 8, _health_end, _panel_y + 12, false);
+draw_set_colour(make_colour_rgb(211, 131, 83));
+draw_rectangle(_health_end, _panel_y + 8, 209, _panel_y + 12, false);
+
+var _magic_end = 59 + clamp(global.magic, 0, MAX_MAGIC);
+draw_set_colour(make_colour_rgb(0, 255, 0));
+draw_rectangle(59, _panel_y + 20, _magic_end, _panel_y + 24, false);
+draw_set_colour(make_colour_rgb(211, 131, 83));
+draw_rectangle(_magic_end, _panel_y + 20, 209, _panel_y + 24, false);
+
+var _jewels = string(global.jewels);
+var _jewel_x = 70;
+if (string_length(_jewels) == 2) _jewel_x = 66;
+else if (string_length(_jewels) >= 3) _jewel_x = 62;
+draw_original_text(_jewels, _jewel_x, _panel_y + 32);
+
+var _keys = string(global.keys);
+var _key_x = 150;
+if (string_length(_keys) == 2) _key_x = 146;
+else if (string_length(_keys) >= 3) _key_x = 142;
+draw_original_text(_keys, _key_x, _panel_y + 32);
+
+var _score = string(global.score);
+draw_original_text(_score, 276 - string_length(_score) * 8, _panel_y + 32);
 
 draw_set_colour(c_white);
-draw_set_font(-1);
-
-var _y = 8;
-var _lh = 20;
-draw_text(8, _y, "HP: " + string(global.health) + "/" + string(MAX_HEALTH));
-draw_text(200, _y, "JEWELS: " + string(global.jewels));
-_y += _lh;
-draw_text(8, _y, "MAGIC: " + string(global.magic));
-draw_text(200, _y, "KEYS: " + string(global.keys));
-_y += _lh;
-draw_text(8, _y, "SCORE: " + string(global.score));
-draw_text(200, _y, "LEVEL: " + string(global.current_level));
-
-if (global.debug_mode) {
-    _y += _lh;
-    if (global.player != noone && instance_exists(global.player)) {
-        draw_text(8, _y, "POS: " + string(global.player.x) + "," + string(global.player.y));
-        draw_text(200, _y, "DIR: " + string(global.player.facing));
-    }
-}
+dialogue_draw();
+menu_draw();

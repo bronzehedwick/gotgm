@@ -1,0 +1,1 @@
+{"$GMScript":"v1","%Name":"scr_dialogue","isCompatibility":false,"isDnD":false,"name":"scr_dialogue","parent":{"name":"Engine","path":"folders/Scripts/Engine.yy"},"resourceType":"GMScript","resourceVersion":"2.0"}

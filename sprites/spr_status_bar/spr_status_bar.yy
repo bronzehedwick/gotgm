@@ -2,7 +2,7 @@
   "$GMSprite":"v2",
   "%Name":"spr_status_bar",
   "bboxMode":0,
-  "bbox_bottom":49,
+  "bbox_bottom":47,
   "bbox_left":0,
   "bbox_right":319,
   "bbox_top":0,
@@ -22,7 +22,7 @@
   ],
   "gridX":0,
   "gridY":0,
-  "height":50,
+  "height":48,
   "HTile":false,
   "layers":[
     {

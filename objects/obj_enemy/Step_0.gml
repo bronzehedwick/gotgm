@@ -1,20 +1,26 @@
 /// @description Enemy update
-if (is_dead) return;
+if (global.menu.active) exit;
+if (dialogue_cooldown > 0) dialogue_cooldown--;
+if (dialogue_contact_latched
+&& (global.player == noone || !instance_exists(global.player) || !place_meeting(x, y, obj_player))) {
+    dialogue_contact_latched = false;
+}
+if (global.dialogue.active || is_dead || !visible) exit;
 
-// Movement
+enemy_fire_pattern(id);
 movement_execute(id);
 
-// Animation
-frame_count++;
-if (frame_count >= frame_speed) {
-    frame_count = 0;
-    current_frame = (current_frame + 1) mod anim_frames;
-    image_index = current_frame;
+// Original next_frame only advances animation when a movement tick occurs.
+if (movement_tick && move_pattern != 15 && move_pattern != 22) {
+    frame_count++;
+    if (frame_count >= frame_speed) {
+        frame_count = 0;
+        current_frame = (current_frame + 1) mod array_length(frame_sequence);
+    }
 }
 
-// Vulnerability flash
-if (vulnerable_timer > 0) {
-    vulnerable_timer--;
-}
+var _pose = frame_sequence[clamp(current_frame, 0, array_length(frame_sequence) - 1)];
+image_index = _pose + ((directions > 1) ? facing * anim_frames : 0);
 
+if (vulnerable_timer > 0) vulnerable_timer--;
 image_speed = 0;

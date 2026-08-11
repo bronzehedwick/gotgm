@@ -1,0 +1,51 @@
+{
+  "$GMObject": "",
+  "%Name": "obj_actor_017_beetle",
+  "eventList": [
+    {
+      "$GMEvent": "v1",
+      "%Name": "",
+      "collisionObjectId": null,
+      "eventNum": 0,
+      "eventType": 0,
+      "isDnD": false,
+      "name": "",
+      "resourceType": "GMEvent",
+      "resourceVersion": "2.0"
+    }
+  ],
+  "managed": true,
+  "name": "obj_actor_017_beetle",
+  "overriddenProperties": [],
+  "parent": {
+    "name": "Original Actors",
+    "path": "folders/Objects/Actors/Original Actors.yy"
+  },
+  "parentObjectId": {
+    "name": "obj_enemy",
+    "path": "objects/obj_enemy/obj_enemy.yy"
+  },
+  "persistent": false,
+  "physicsAngularDamping": 0.1,
+  "physicsDensity": 0.5,
+  "physicsFriction": 0.2,
+  "physicsGroup": 1,
+  "physicsKinematic": false,
+  "physicsLinearDamping": 0.1,
+  "physicsObject": false,
+  "physicsRestitution": 0.1,
+  "physicsSensor": false,
+  "physicsShape": 1,
+  "physicsShapePoints": [],
+  "physicsStartAwake": true,
+  "properties": [],
+  "resourceType": "GMObject",
+  "resourceVersion": "2.0",
+  "solid": false,
+  "spriteId": {
+    "name": "spr_actor_017_beetle",
+    "path": "sprites/spr_actor_017_beetle/spr_actor_017_beetle.yy"
+  },
+  "spriteMaskId": null,
+  "visible": true
+}

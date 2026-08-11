@@ -1,0 +1,73 @@
+{
+  "actor_number": 64,
+  "actor_info": {
+    "move": 26,
+    "width": 16,
+    "height": 16,
+    "directions": 2,
+    "frames": 4,
+    "frame_speed": 12,
+    "frame_sequence": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "speed": 1,
+    "size_x": 15,
+    "size_y": 15,
+    "strength": 20,
+    "health": 100,
+    "num_moves": 1,
+    "shot_type": 0,
+    "shot_pattern": 7,
+    "shots_allowed": 3,
+    "solid": 2,
+    "flying": 1,
+    "rating": 0,
+    "type": 2,
+    "name": "18:LOKI",
+    "func_num": 0,
+    "func_pass": 0,
+    "magic_hurts": 0
+  },
+  "shot_info": {
+    "move": 4,
+    "width": 16,
+    "height": 16,
+    "directions": 1,
+    "frames": 4,
+    "frame_speed": 2,
+    "frame_sequence": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "speed": 2,
+    "size_x": 15,
+    "size_y": 15,
+    "strength": 20,
+    "health": 255,
+    "num_moves": 1,
+    "shot_type": 0,
+    "shot_pattern": 0,
+    "shots_allowed": 0,
+    "solid": 1,
+    "flying": 1,
+    "rating": 0,
+    "type": 3,
+    "name": "LOKIS1",
+    "func_num": 0,
+    "func_pass": 0,
+    "magic_hurts": 0
+  },
+  "spritesheet": {
+    "frame_width": 16,
+    "frame_height": 16,
+    "columns": 10,
+    "rows": 2,
+    "actor_frames": 16,
+    "shot_frames": 4
+  }
+}

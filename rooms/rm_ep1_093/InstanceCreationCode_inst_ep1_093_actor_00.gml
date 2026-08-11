@@ -1,0 +1,1 @@
+actor_configure(id, 27, 0, 0, 0, 3);

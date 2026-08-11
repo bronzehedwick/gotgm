@@ -1,37 +1,58 @@
 /// @description Player update
+if (global.menu.active) exit;
+if (global.dialogue.active) {
+    is_moving = false;
+    anim_frame = 0;
+    image_index = 0;
+    exit;
+}
+
+if (global.health <= 0) {
+    checkpoint_restore();
+    exit;
+}
+
 var _input = input_check();
 
-// Process invulnerability
-if (invulnerable_timer > 0) {
-    invulnerable_timer--;
-}
+if (_input.item_next) magic_select_next();
+var _magic_just_pressed = _input.magic && !magic_was_down;
+magic_update(_input.magic, _magic_just_pressed);
+magic_was_down = _input.magic;
+if (global.thunder_timer > 0) global.thunder_timer--;
 
-// Process hammer cooldown
-if (hammer_cooldown > 0) {
-    hammer_cooldown--;
-}
+if (invulnerable_timer > 0) invulnerable_timer--;
+if (hammer_cooldown > 0) hammer_cooldown--;
 
-// Movement
 var _dx = 0;
 var _dy = 0;
 is_moving = false;
+input_diagonal = false;
 
-if (_input.left)  { _dx = -move_speed; facing = Dir.LEFT; }
-if (_input.right) { _dx =  move_speed; facing = Dir.RIGHT; }
-if (_input.up)    { _dy = -move_speed; facing = Dir.UP; }
-if (_input.down)  { _dy =  move_speed; facing = Dir.DOWN; }
+// MOVPAT.C gives horizontal facing priority for diagonal movement.
+if (_input.up && _input.left) {
+    _dx = -move_speed; _dy = -move_speed; facing = Dir.LEFT; input_diagonal = true;
+}
+else if (_input.up && _input.right) {
+    _dx = move_speed; _dy = -move_speed; facing = Dir.RIGHT; input_diagonal = true;
+}
+else if (_input.down && _input.left) {
+    _dx = -move_speed; _dy = move_speed; facing = Dir.LEFT; input_diagonal = true;
+}
+else if (_input.down && _input.right) {
+    _dx = move_speed; _dy = move_speed; facing = Dir.RIGHT; input_diagonal = true;
+}
+else if (_input.left)  { _dx = -move_speed; facing = Dir.LEFT; }
+else if (_input.right) { _dx =  move_speed; facing = Dir.RIGHT; }
+else if (_input.up)    { _dy = -move_speed; facing = Dir.UP; }
+else if (_input.down)  { _dy =  move_speed; facing = Dir.DOWN; }
 
-// Move one axis at a time for slide-along-walls behavior
 if (_dx != 0) {
-    // Move pixel by pixel for accuracy
     var _sign_x = sign(_dx);
     for (var i = 0; i < abs(_dx); i++) {
         if (check_move_player(x, y, col_w, col_h, _sign_x, 0)) {
             x += _sign_x;
             is_moving = true;
-        } else {
-            break;
-        }
+        } else break;
     }
 }
 if (_dy != 0) {
@@ -40,13 +61,10 @@ if (_dy != 0) {
         if (check_move_player(x, y, col_w, col_h, 0, _sign_y)) {
             y += _sign_y;
             is_moving = true;
-        } else {
-            break;
-        }
+        } else break;
     }
 }
 
-// Animation
 if (is_moving) {
     anim_timer++;
     if (anim_timer >= anim_speed) {
@@ -60,22 +78,24 @@ if (is_moving) {
 
 sprite_index = dir_sprites[facing];
 image_index = anim_frame;
-image_speed = 0; // manual animation control
+image_speed = 0;
 
-// Throw hammer
 if (_input.fire && hammer_cooldown <= 0) {
     if (global.hammer == noone || !instance_exists(global.hammer)) {
-        var _h = instance_create_layer(x, y, "Instances", obj_hammer);
+        var _h = instance_create_layer(x, y, "Actors", obj_hammer);
         _h.facing = facing;
+        if (global.selected_item == 3 && _input.magic && global.magic > 0) _h.move_speed = 6;
         global.hammer = _h;
+        audio_play_sound(snd_got_swish, 0, false);
         hammer_cooldown = 10;
     }
 }
 
-// Check enemy contact damage
 if (invulnerable_timer <= 0) {
     var _enemy = instance_place(x, y, obj_enemy);
-    if (_enemy != noone) {
-        combat_player_hit(_enemy.strength);
+    if (_enemy != noone && _enemy.visible) {
+        if (!actor_trigger_special(_enemy, false)) {
+            combat_player_hit(_enemy.strength);
+        }
     }
 }

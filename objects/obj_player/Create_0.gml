@@ -25,3 +25,4 @@ is_moving = false;
 
 // Hammer state
 hammer_cooldown = 0;
+magic_was_down = false;

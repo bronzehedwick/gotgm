@@ -1,0 +1,25 @@
+/// @description Defaults filled by enemy_spawn_shot
+creator_id = noone;
+shot_type = 0;
+shot_def = undefined;
+shot_move = 1;
+shot_speed = 1;
+shot_num_moves = 1;
+shot_flying = true;
+shot_strength = 1;
+shot_w = 15;
+shot_h = 15;
+shot_directions = 1;
+shot_frames = 1;
+shot_frame_speed = 4;
+shot_sequence = [0];
+facing = Dir.DOWN;
+speed_count = 0;
+frame_count = 0;
+current_frame = 0;
+life_timer = 180;
+velocity_x = 0;
+velocity_y = 0;
+angle_target_x = x;
+angle_target_y = y;
+image_speed = 0;

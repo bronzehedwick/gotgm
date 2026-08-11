@@ -1,28 +1,49 @@
-/// @description Enemy initialization (set by actor_spawn)
+/// @description Enemy defaults; decoded actor data is applied by actor_configure.
 actor_type_id = 0;
 actor_def = undefined;
-
 move_pattern = 1;
 health = 10;
 strength = 1;
-speed = 2;
+move_delay = 2;
 num_moves = 1;
 solid_type = 0;
 is_flying = false;
-
 col_w = 15;
 col_h = 15;
-
 directions = 1;
 anim_frames = 4;
 frame_speed = 6;
 frame_sequence = [0, 1, 2, 3];
-
 facing = Dir.DOWN;
 pass_value = 0;
+actor_slot = -1;
+invisibility_group = 0;
+dialogue_cooldown = 0;
+dialogue_contact_latched = false;
 speed_count = 0;
 frame_count = 0;
 current_frame = 0;
+movement_tick = false;
 vulnerable_timer = 0;
 is_dead = false;
 pause_timer = 0;
+move_counter = 0;
+axis_toggle = false;
+ai_timer = 0;
+ai_seek = false;
+spear_timer = 0;
+spear_phase = 0;
+fish_pause = 0;
+trap_falling = false;
+dart_initialized = false;
+dart_timer = 0;
+dart_origin_x = x;
+dart_origin_y = y;
+dart_initial_dir = facing;
+dart_return_dir = facing;
+dart_state = 0;
+shot_type = 100;
+shot_pattern = 0;
+shots_allowed = 0;
+shot_cooldown = 0;
+shot_random_timer = 0;

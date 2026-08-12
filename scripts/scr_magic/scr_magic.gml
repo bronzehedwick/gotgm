@@ -30,6 +30,67 @@ function magic_area_damage(radius, damage) {
     }
 }
 
+function magic_destroy_tornado() {
+    if (global.tornado_instance != noone && instance_exists(global.tornado_instance)) {
+        with (global.tornado_instance) instance_destroy();
+    }
+    global.tornado_instance = noone;
+    global.tornado_timer = 0;
+}
+
+function magic_spawn_tornado() {
+    magic_destroy_tornado();
+    var _tornado = actor_spawn(
+        108, global.player.x, global.player.y, 0, global.player.facing
+    );
+    if (_tornado == noone) return false;
+    _tornado.sprite_index = spr_actor_108_tornado;
+    _tornado.move_pattern = 16;
+    _tornado.actor_slot = 2;
+    _tornado.is_magic_effect = true;
+    _tornado.is_flying = true;
+    _tornado.solid_type |= 128;
+    _tornado.strength = 20;
+    _tornado.image_speed = 0;
+    global.tornado_instance = _tornado;
+    global.tornado_timer = 1;
+    return true;
+}
+
+function magic_tornado_damage(tornado) {
+    if (!instance_exists(tornado)) return;
+    var _x1 = tornado.x;
+    var _y1 = tornado.y;
+    var _x2 = _x1 + tornado.col_w - 1;
+    var _y2 = _y1 + tornado.col_h - 1;
+    for (var _i = 0; _i < instance_number(obj_enemy); _i++) {
+        var _target = instance_find(obj_enemy, _i);
+        if (_target == noone || _target.id == tornado.id || _target.is_magic_effect
+        || !_target.visible || _target.is_dead) continue;
+        if (_x1 <= _target.x + _target.col_w - 1 && _x2 >= _target.x
+        && _y1 <= _target.y + _target.col_h - 1 && _y2 >= _target.y) {
+            combat_enemy_hit(_target, tornado.strength);
+        }
+    }
+}
+
+/// The DOS main loop counts thunder from 60 down and damages source actor
+/// slots 15 through 3 one at a time. This preserves its staggered hits and
+/// avoids the port''s former all-at-once damage burst.
+function magic_update_effects() {
+    if (global.lightning_timer > 0) global.lightning_timer--;
+    if (global.thunder_timer > 0) {
+        global.thunder_timer--;
+        if (global.thunder_timer < MAX_ACTORS && global.thunder_timer > 2) {
+            var _target = movement_actor_slot(global.thunder_timer);
+            if (_target != noone && !_target.is_magic_effect) {
+                _target.vulnerable_timer = 0;
+                combat_enemy_hit(_target, 20);
+            }
+        }
+    }
+}
+
 function magic_update(is_down, just_pressed) {
     if (global.player == noone || !instance_exists(global.player)) return;
 
@@ -37,7 +98,7 @@ function magic_update(is_down, just_pressed) {
     if (!is_down) {
         global.magic_use_timer = 0;
         global.shield_on = false;
-        if (global.selected_item == 4) global.tornado_timer = 0;
+        magic_destroy_tornado();
         return;
     }
 
@@ -58,6 +119,7 @@ function magic_update(is_down, just_pressed) {
             if (just_pressed && global.magic >= 15) {
                 global.magic -= 15;
                 audio_play_sound(snd_got_electric, 4, false);
+                global.lightning_timer = 30;
                 magic_area_damage(30, 254);
             }
             break;
@@ -72,15 +134,14 @@ function magic_update(is_down, just_pressed) {
         case 4: // tornado: starts at 10 magic, then drains while held
             if (just_pressed && global.magic > 10) {
                 global.magic -= 10;
-                global.tornado_timer = 20;
-                audio_play_sound(snd_got_wind, 2, false);
-            } else if (global.tornado_timer > 0 && _pulse && global.magic > 0) {
+                if (magic_spawn_tornado())
+                    audio_play_sound(snd_got_wind, 2, false);
+            } else if (global.tornado_instance != noone
+            && instance_exists(global.tornado_instance) && _pulse && global.magic > 0) {
                 global.magic--;
             }
-            if (global.tornado_timer > 0) {
-                global.tornado_timer--;
-                magic_area_damage(42, 10);
-            }
+            if (global.tornado_instance == noone || !instance_exists(global.tornado_instance))
+                global.tornado_timer = 0;
             break;
 
         case 5: // shield: held, drains one magic every nine counts
@@ -95,10 +156,6 @@ function magic_update(is_down, just_pressed) {
                 global.magic -= 30;
                 global.thunder_timer = 60;
                 audio_play_sound(snd_got_thunder, 4, false);
-                with (obj_enemy) {
-                    vulnerable_timer = 0;
-                    combat_enemy_hit(id, 20);
-                }
             }
             break;
     }
@@ -106,6 +163,7 @@ function magic_update(is_down, just_pressed) {
     if (global.magic <= 0) {
         global.magic = 0;
         global.shield_on = false;
+        magic_destroy_tornado();
         if (global.selected_item == 3) global.player.move_speed = 2;
     }
 }

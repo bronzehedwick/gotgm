@@ -82,9 +82,10 @@ Implemented and compiling in GameMaker 2024.14:
   directional barrels, wall-following spinballs, and multipart troll movement
 - all episode-specific dialogue `EXEC` helpers, including mining, arrest
   transfer, randomized charges, and the Episode 1 troll step-aside event
-- functional multipart snake, skull, and Loki encounters with persistent defeat state
-- six inventory items with original costs/timing (tornado/thunder visuals are
-  currently simplified)
+- multipart snake, skull, and Loki encounters with source-aligned phase changes,
+  attacks, dialogue, boss meter, and persistent defeat state
+- six inventory items with original costs/timing, including persistent tornado,
+  sequential thunder damage, shield art, and lightning/thunder presentation
 - all 16 original digitized sound effects and the original music tracks
 - original-style opening/options menus, the original Episode 1 scrolling story,
   music controls, skill setting, help, and JSON save/load
@@ -92,9 +93,11 @@ Implemented and compiling in GameMaker 2024.14:
 - all three original conversation/quest banks, including speech pages, choices,
   numeric/string variables, branching, subroutines, loops, flags, quest items,
   stat changes, sound cues, actor reveals, and persistent scripted tile changes
+- source-aligned boss rewards and closing dialogue, silver/golden armor and
+  hammer progression, exit opening, Episode 3 collapse, and completion screens
 
 Still incomplete compared with the published DOS game:
 
-- exact boss phase choreography, status presentation, and closing sequences
-- exact ending and closing sequences
-- dedicated tornado/thunder presentation and a few less-used projectile details
+- frame-perfect DOS palette rotations and timing during boss introductions/deaths
+- the illustrated DOS ending presentation (completion and progression are functional)
+- byte-identical tornado/thunder display effects and a few less-used projectile details

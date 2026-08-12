@@ -6,6 +6,8 @@ if (global.last_room != room) {
     level_enter_current_room();
     if (global.player != noone && instance_exists(global.player)) checkpoint_save();
 }
+magic_update_effects();
+combat_update_progression();
 
 if (global.player == noone || !instance_exists(global.player)) {
     global.player = instance_find(obj_player, 0);

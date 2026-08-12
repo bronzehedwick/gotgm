@@ -8,8 +8,13 @@ if (dialogue_contact_latched
 }
 if (global.dialogue.active || is_dead || !visible) exit;
 
+if (is_magic_effect) {
+    movement_execute(id);
+    magic_tornado_damage(id);
+} else {
 enemy_fire_pattern(id);
 movement_execute(id);
+}
 
 // Original next_frame only advances animation when a movement tick occurs.
 if (movement_tick && move_pattern != 15 && move_pattern != 22) {

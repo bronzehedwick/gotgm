@@ -16,6 +16,8 @@ function checkpoint_save() {
         selected_item: global.selected_item,
         quest_object: global.quest_object,
         inventory_json: json_stringify(global.inventory),
+        armor_level: global.armor_level,
+        hammer_damage: global.hammer_damage,
     };
 }
 
@@ -35,6 +37,10 @@ function checkpoint_restore() {
     global.selected_item = _save.selected_item;
     global.quest_object = _save.quest_object;
     global.inventory = json_parse(_save.inventory_json);
+    global.armor_level = variable_struct_exists(_save, "armor_level")
+        ? _save.armor_level : ((_save.episode == 1) ? 0 : _save.episode - 1);
+    global.hammer_damage = variable_struct_exists(_save, "hammer_damage")
+        ? _save.hammer_damage : ((_save.episode == 1) ? 10 : ((_save.episode == 2) ? 13 : 17));
     global.current_episode = _save.episode;
     global.current_level = _save.level;
 
@@ -55,6 +61,14 @@ function combat_player_hit(damage) {
     if (global.shield_on) return;
     if (damage != 255 && global.difficulty == 0) damage = damage div 2;
     else if (damage != 255 && global.difficulty == 2) damage *= 2;
+
+    // Episodes 2 and 3 start with the silver and golden armor awarded by the
+    // previous chapter. Their original executables reduce ordinary damage by
+    // one quarter and one third respectively.
+    if (damage < 150) {
+        if (global.armor_level == 1) damage -= damage div 4;
+        else if (global.armor_level >= 2) damage -= damage div 3;
+    }
 
 
     audio_play_sound(snd_got_ow, 2, false);
@@ -115,6 +129,7 @@ function actor_trigger_special(actor_inst, from_hammer) {
 }
 
 function combat_enemy_hit(enemy_inst, damage) {
+    if (!instance_exists(enemy_inst) || enemy_inst.is_magic_effect) return;
     if (actor_trigger_special(enemy_inst, true)) return;
     if (combat_boss_hit(enemy_inst, damage)) return;
     if (enemy_inst.solid_type == 2) {
@@ -149,6 +164,100 @@ function combat_enemy_hit(enemy_inst, damage) {
         }
         combat_drop_loot(enemy_inst);
         with (enemy_inst) instance_destroy();
+    }
+}
+
+function combat_reward_episode(episode) {
+    global.score = min(
+        MAX_SCORE,
+        global.score + 20000 + (global.health + global.magic + global.jewels) * 10
+    );
+    global.health = MAX_HEALTH;
+    global.magic = MAX_MAGIC;
+    global.jewels = 0;
+
+    if (episode == 1) {
+        global.armor_level = 1;
+        global.hammer_damage = 13;
+    } else if (episode == 2) {
+        global.armor_level = 2;
+        global.hammer_damage = 17;
+    }
+}
+
+function combat_begin_boss_closing() {
+    var _episode = global.current_episode;
+    var _level = global.current_level;
+    global.post_boss_episode = _episode;
+    global.post_boss_stage = 1;
+    music_play_victory();
+
+    if (_episode == 1 && _level == 59) {
+        dialogue_place_tile(59, 138, 148);
+        dialogue_place_tile(59, 139, 202);
+        dialogue_start(1001, spr_dialogue_odin);
+    } else if (_episode == 2 && _level == 60) {
+        dialogue_place_tile(60, 218, 152);
+        dialogue_place_tile(60, 219, 202);
+        dialogue_start(1001, spr_dialogue_odin);
+    } else if (_episode == 3 && _level == 95) {
+        dialogue_start(1001, spr_dialogue_odin);
+    } else {
+        global.post_boss_stage = 0;
+    }
+}
+
+function combat_update_progression() {
+    if (global.post_boss_stage == 1 && !global.dialogue.active) {
+        var _episode = global.post_boss_episode;
+        combat_reward_episode(_episode);
+        if (_episode <= 2) {
+            global.post_boss_stage = 2;
+            dialogue_start(1002, spr_dialogue_odin);
+        } else {
+            global.post_boss_stage = 0;
+            global.endgame_active = true;
+            global.endgame_timer = 0;
+            global.endgame_tile_index = 0;
+            global.endgame_tiles = [
+                126,127,128,129,130,131,132,133,
+                146,147,148,149,150,151,152,153,
+                166,167,168,169,170,171,172,173,
+                186,187,188,189,190,191,192,193
+            ];
+            if (global.player != noone && instance_exists(global.player)) {
+                global.player.x = 152;
+                global.player.y = 160;
+            }
+            var _ending_room = level_room_asset(3, 106);
+            if (_ending_room != -1) room_goto(_ending_room);
+        }
+    } else if (global.post_boss_stage == 2 && !global.dialogue.active) {
+        global.post_boss_stage = 0;
+    }
+
+    if (global.endgame_active && global.current_episode == 3
+    && global.current_level == 106) {
+        global.endgame_timer++;
+        if (global.endgame_timer >= 8
+        && global.endgame_tile_index < array_length(global.endgame_tiles)) {
+            global.endgame_timer = 0;
+            var _position = global.endgame_tiles[global.endgame_tile_index++];
+            level_set_tile(
+                _position mod GRID_COLS,
+                _position div GRID_COLS,
+                global.current_level_metadata.bg_color
+            );
+            if ((global.endgame_tile_index mod 4) == 1)
+                audio_play_sound(snd_got_explode, 3, false);
+        }
+    }
+
+    if (global.episode_complete) {
+        global.episode_complete = false;
+        global.endgame_active = false;
+        magic_destroy_tornado();
+        menu_show_ending(global.current_episode);
     }
 }
 
@@ -187,9 +296,26 @@ function combat_boss_hit(enemy_inst, damage) {
     // The serpent's vulnerable spot is its upper-right quadrant.
     if (_snake && _type != 23) return true;
     var _leader = movement_actor_slot(3);
-    if (_leader == noone || _leader.vulnerable_timer > 0 || _leader.is_dead) return true;
+    if (_leader == noone || _leader.vulnerable_timer > 0 || _leader.is_dead
+    || _leader.boss_invulnerable) return true;
 
     _leader.health -= 10;
+    if (_skull && _leader.health == 50) {
+        _leader.boss_state = 1;
+        _leader.boss_counter = 0;
+        _leader.boss_timer = 1;
+        _leader.boss_invulnerable = true;
+        _leader.num_moves = 1;
+        with (obj_enemy_shot) instance_destroy();
+        audio_play_sound(snd_got_explode, 4, false);
+    } else if (_loki && _leader.health == 50) {
+        _leader.boss_state = 1;
+        _leader.boss_counter = 0;
+        _leader.boss_timer = 1;
+        _leader.boss_invulnerable = true;
+        with (obj_enemy_shot) instance_destroy();
+        dialogue_start(1003, asset_get_index("spr_face_18"));
+    }
     for (var _i = 0; _i < instance_number(obj_enemy); _i++) {
         var _part = instance_find(obj_enemy, _i);
         if (_part == noone) continue;
@@ -204,12 +330,8 @@ function combat_boss_hit(enemy_inst, damage) {
     if (_leader.health > 0) return true;
 
     global.flags[$ "boss_" + string(global.current_episode) + "_" + string(global.current_level)] = true;
-    global.score = min(MAX_SCORE, global.score + 10000);
     audio_play_sound(snd_got_explode, 5, false);
-    if (_snake && global.current_episode == 1 && global.current_level == 59) {
-        dialogue_place_tile(59, 138, 148);
-        dialogue_place_tile(59, 139, 202);
-    }
+    combat_begin_boss_closing();
     for (var _j = instance_number(obj_enemy) - 1; _j >= 0; _j--) {
         var _victim = instance_find(obj_enemy, _j);
         if (_victim == noone) continue;

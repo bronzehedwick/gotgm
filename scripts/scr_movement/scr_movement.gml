@@ -215,6 +215,8 @@ function move_mushroom() {
     if (pause_timer > 0) {
         pause_timer--;
         strength = 0;
+        vulnerable_timer = max(vulnerable_timer, 5);
+        if (pause_timer <= 0) move_counter = 60;
         return;
     }
 
@@ -493,6 +495,7 @@ function move_snake_boss() {
         && abs((y + 20) - (global.player.y + 8)) < 8) {
             boss_state = 1;
             boss_timer = 75;
+            num_moves = 6;
         } else {
             if (facing > Dir.DOWN) facing = Dir.DOWN;
             var _dy = (facing == Dir.UP) ? -2 : 2;
@@ -504,6 +507,7 @@ function move_snake_boss() {
         if (boss_timer <= 0) {
             boss_state = 2;
             boss_timer = 130;
+            num_moves = global.difficulty + 2;
             audio_play_sound(snd_got_braapp, 2, false);
         }
     } else if (boss_state == 2) {
@@ -512,12 +516,14 @@ function move_snake_boss() {
         boss_timer--;
         if (boss_timer <= 0 || x < global.player.x + 12) boss_state = 3;
     } else {
+        num_moves = global.difficulty + 1;
         facing = Dir.RIGHT;
         x += 2;
         if (x >= 256) {
             x = 256;
             boss_state = 0;
             boss_timer = irandom_range(10, 99);
+            num_moves = 2;
         }
     }
 
@@ -549,25 +555,90 @@ function move_loki_boss() {
     if (actor_slot != 3 || actor_type_id != 64) return;
     if (global.player == noone || !instance_exists(global.player)) return;
 
-    boss_timer--;
-    if (boss_timer <= 0) {
-        var _tx = x;
-        var _ty = y;
-        for (var _attempt = 0; _attempt < 12; _attempt++) {
-            _tx = irandom_range(16, 272);
-            _ty = irandom_range(8, 144);
-            if (point_distance(_tx, _ty, global.player.x, global.player.y) > 48) break;
+    if (boss_state == 0) {
+        boss_counter++;
+        boss_timer--;
+        if (boss_timer <= 0) {
+            boss_direction8 = irandom(7);
+            boss_timer = irandom_range(60, 159);
         }
-        x = _tx;
-        y = _ty;
-        facing = Dir.UP;
-        audio_play_sound(snd_got_explode, 3, false);
-        var _shot = enemy_spawn_embedded_shot(id, 65);
-        if (_shot != noone) {
-            _shot.x = x + 8;
-            _shot.y = y + 16;
+
+        var _loki_dx = 0;
+        var _loki_dy = 0;
+        switch (boss_direction8) {
+            case 0: _loki_dy = -2; facing = Dir.UP; break;
+            case 1: _loki_dy = 2; facing = Dir.DOWN; break;
+            case 2: _loki_dx = -2; facing = Dir.LEFT; break;
+            case 3: _loki_dx = 2; facing = Dir.RIGHT; break;
+            case 4: _loki_dx = -2; _loki_dy = -2; facing = Dir.LEFT; break;
+            case 5: _loki_dx = 2; _loki_dy = -2; facing = Dir.RIGHT; break;
+            case 6: _loki_dx = 2; _loki_dy = 2; facing = Dir.RIGHT; break;
+            case 7: _loki_dx = -2; _loki_dy = 2; facing = Dir.LEFT; break;
         }
-        boss_timer = max(55, 105 - global.difficulty * 20);
+        if (!check_move_enemy(x, y, 31, 31, _loki_dx, _loki_dy, true)) {
+            boss_timer = 0;
+        } else {
+            x += _loki_dx;
+            y += _loki_dy;
+        }
+
+        if (boss_counter >= 120) {
+            boss_counter = 0;
+            var _first_shot = enemy_spawn_embedded_shot(id, 64);
+            if (_first_shot != noone) {
+                _first_shot.x = x + 8;
+                _first_shot.y = y - 8;
+            }
+            audio_play_sound(snd_got_electric, 3, false);
+        }
+        boss_invulnerable = false;
+        image_alpha = 1;
+    } else {
+        boss_timer--;
+        if (boss_timer > 80) {
+            boss_invulnerable = true;
+            image_alpha = 0.25;
+        } else if (boss_timer == 80) {
+            var _tx = x;
+            var _ty = y;
+            for (var _attempt = 0; _attempt < 12; _attempt++) {
+                _tx = irandom_range(16, 272);
+                _ty = irandom_range(8, 144);
+                if (point_distance(_tx, _ty, global.player.x, global.player.y) > 48) break;
+            }
+            x = _tx;
+            y = _ty;
+            facing = Dir.UP;
+            boss_invulnerable = false;
+            image_alpha = 1;
+            audio_play_sound(snd_got_explode, 3, false);
+
+            var _pod_source = movement_actor_slot(4);
+            if (_pod_source != noone) {
+                var _pods = (global.difficulty == 0) ? 3
+                    : ((global.difficulty == 1) ? 5 : 8);
+                _pod_source.shots_allowed = max(_pod_source.shots_allowed, _pods);
+                for (var _pod_index = 0; _pod_index < _pods; _pod_index++) {
+                    var _pod = enemy_spawn_embedded_shot(_pod_source, 65);
+                    if (_pod != noone) {
+                        _pod.x = x + 8;
+                        _pod.y = y + 16;
+                        _pod.angle_target_x = global.player.x + irandom_range(-32, 32);
+                        _pod.angle_target_y = global.player.y + irandom_range(-32, 32);
+                    }
+                }
+            }
+        } else if (boss_timer <= 0) {
+            boss_timer = 160;
+            boss_invulnerable = true;
+            image_alpha = 0.25;
+            audio_play_sound(snd_got_explode, 3, false);
+        }
+    }
+
+    for (var _part_slot = 4; _part_slot <= 6; _part_slot++) {
+        var _loki_part = movement_actor_slot(_part_slot);
+        if (_loki_part != noone) _loki_part.image_alpha = image_alpha;
     }
 
     movement_sync_part(4, x + 16, y, current_frame, facing);
@@ -577,26 +648,79 @@ function move_loki_boss() {
 
 function move_skull_boss() {
     if (actor_slot != 3 || actor_type_id != 31) return;
-    if (facing != Dir.LEFT && facing != Dir.RIGHT) facing = Dir.LEFT;
-    var _dx = (facing == Dir.LEFT) ? -2 : 2;
-    var _next_x = x + _dx;
-    if (_next_x < 18 || _next_x > 272
-    || !check_move_enemy(x, y, 31, 31, _dx, 0, true)) {
-        facing = move_reverse_direction(facing);
-    } else {
-        x = _next_x;
-    }
-
-    boss_timer--;
-    if (boss_timer <= 0) {
-        var _shot = enemy_spawn_embedded_shot(id, 31);
-        if (_shot != noone) {
-            _shot.x = x + 12;
-            _shot.y = y + 32;
-            _shot.shot_move = 7;
+    if (boss_state == 1) {
+        boss_invulnerable = true;
+        boss_timer--;
+        if (boss_timer <= 0) {
+            boss_timer = 6;
+            var _floor_row = 3 + boss_counter div 10;
+            var _floor_step = boss_counter mod 10;
+            var _floor_column = 1 + (_floor_step div 2) * 4 + (_floor_step mod 2);
+            level_set_tile(_floor_column, _floor_row, global.current_level_metadata.bg_color);
+            if ((boss_counter mod 3) == 0)
+                audio_play_sound(snd_got_explode, 3, false);
+            boss_counter++;
+            if (boss_counter >= 60) {
+                boss_state = 2;
+                boss_counter = 0;
+                boss_invulnerable = false;
+                num_moves = 3;
+            }
         }
-        audio_play_sound(snd_got_fall, 2, false);
-        boss_timer = max(35, 75 - global.difficulty * 15);
+    } else if (boss_state == 2) {
+        boss_invulnerable = false;
+        if (boss_counter == 0) {
+            if (x < 144) x += 2;
+            else if (x > 144) x -= 2;
+            else {
+                boss_counter = 1;
+                boss_direction8 = irandom(1);
+            }
+        } else {
+            var _phase_dx = (boss_direction8 == 0) ? -2 : 2;
+            x += _phase_dx;
+            facing = (_phase_dx < 0) ? Dir.LEFT : Dir.RIGHT;
+            if (x < 20 || x > 270) {
+                x = clamp(x, 20, 270);
+                boss_counter = 0;
+                audio_play_sound(snd_got_explode, 4, false);
+                var _spike_source = movement_actor_slot(4);
+                if (_spike_source != noone) {
+                    var _spikes = 5 + global.difficulty * 3;
+                    _spike_source.shots_allowed = max(_spike_source.shots_allowed, _spikes);
+                    for (var _spike_index = 0; _spike_index < _spikes; _spike_index++) {
+                        var _spike = enemy_spawn_embedded_shot(_spike_source, 32);
+                        if (_spike != noone) {
+                            _spike.x = (_spike_index == 0)
+                                ? global.player.x : 16 + irandom(17) * 16;
+                            _spike.y = irandom(15);
+                        }
+                    }
+                }
+            }
+        }
+    } else {
+        if (facing != Dir.LEFT && facing != Dir.RIGHT) facing = Dir.LEFT;
+        var _dx = (facing == Dir.LEFT) ? -2 : 2;
+        var _next_x = x + _dx;
+        if (_next_x < 18 || _next_x > 272
+        || !check_move_enemy(x, y, 31, 31, _dx, 0, true)) {
+            facing = move_reverse_direction(facing);
+        } else {
+            x = _next_x;
+        }
+
+        boss_timer--;
+        if (boss_timer <= 0 && (x == 48 || x == 112 || x == 176 || x == 240)) {
+            var _shot = enemy_spawn_embedded_shot(id, 31);
+            if (_shot != noone) {
+                _shot.x = x + 12;
+                _shot.y = y + 32;
+                _shot.shot_move = 7;
+            }
+            audio_play_sound(snd_got_fall, 2, false);
+            boss_timer = 40;
+        }
     }
 
     movement_sync_part(4, x + 16, y, current_frame, facing);

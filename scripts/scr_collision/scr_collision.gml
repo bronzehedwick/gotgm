@@ -11,7 +11,8 @@ function actor_special_move_try(actor_inst, dx, dy) {
     var _ny2 = _ny1 + actor_inst.col_h - 1;
     for (var _i = 0; _i < instance_number(obj_enemy); _i++) {
         var _other = instance_find(obj_enemy, _i);
-        if (_other == noone || _other.id == actor_inst.id || !_other.visible) continue;
+        if (_other == noone || _other.id == actor_inst.id || !_other.visible
+        || _other.is_magic_effect) continue;
         if (_nx1 <= _other.x + _other.col_w - 1 && _nx2 >= _other.x
         && _ny1 <= _other.y + _other.col_h - 1 && _ny2 >= _other.y) return false;
     }
@@ -121,7 +122,8 @@ function check_move_player(px, py, pw, ph, dx, dy) {
     var _py2 = _ny + 15;
     for (var _i = 0; _i < instance_number(obj_enemy); _i++) {
         var _actor = instance_find(obj_enemy, _i);
-        if (_actor == noone || !_actor.visible || ((_actor.solid_type & 128) != 0)) continue;
+        if (_actor == noone || !_actor.visible || _actor.is_magic_effect
+        || ((_actor.solid_type & 128) != 0)) continue;
         var _ax1 = _actor.x + 1;
         var _ay1 = _actor.y + 1;
         var _ax2 = _actor.x + _actor.col_w - 1;

@@ -14,6 +14,12 @@ function level_enter_current_room() {
     var _room_name = room_get_name(room);
     if (string_pos("rm_ep", _room_name) != 1) return;
 
+    magic_destroy_tornado();
+    global.shield_on = false;
+    global.slip_active = false;
+    global.slip_charge = 0;
+    global.slip_timer = 0;
+
     var _episode = real(string_copy(_room_name, 6, 1));
     var _level_index = real(string_copy(_room_name, 8, 3));
     global.current_episode = _episode;
@@ -74,6 +80,17 @@ function level_enter_current_room() {
             || (actor_type_id >= 64 && actor_type_id <= 67)) {
                 instance_destroy();
             }
+        }
+    }
+
+    // Loki introduces himself on the first visit to his arena. The original
+    // stores this separately from the persistent defeated-boss flag.
+    if (_episode == 3 && _level_index == 95
+    && !struct_exists(global.flags, _boss_key)) {
+        var _intro_key = "boss_intro_3_95";
+        if (!struct_exists(global.flags, _intro_key)) {
+            global.flags[$ _intro_key] = true;
+            dialogue_start(1002, asset_get_index("spr_face_18"));
         }
     }
 
@@ -244,7 +261,9 @@ function special_tile_player(grid_x, grid_y, tile_id, proposed_x, proposed_y) {
 
     if (_episode == 1) {
         switch (tile_id) {
-            case 202: return true;  // ending bridge
+            case 202: // ending bridge
+                if (proposed_x > 300) global.episode_complete = true;
+                return true;
             case 203:
             case 204:
             case 212:
@@ -262,10 +281,36 @@ function special_tile_player(grid_x, grid_y, tile_id, proposed_x, proposed_y) {
         }
     } else if (_episode == 2) {
         switch (tile_id) {
-            case 202: return true;  // ending bridge
-            case 203: return true;  // story/object trigger
-            case 204: return true;  // slippery floor
-            case 211: return true;  // thunder/story trigger
+            case 202:
+                if (proposed_x > 300) global.episode_complete = true;
+                return true;
+            case 203:
+                var _ep2_trigger = "ep2_object_tile";
+                if (global.quest_object == 5) {
+                    global.quest_object = 0;
+                    global.flags[$ _ep2_trigger] = true;
+                    dialogue_start(2012, spr_dialogue_odin);
+                } else if (!struct_exists(global.flags, _ep2_trigger)) {
+                    global.flags[$ _ep2_trigger] = true;
+                    dialogue_start(2011, spr_dialogue_odin);
+                }
+                return true;
+            case 204:
+                return true;
+            case 211:
+                if (_direction == Dir.UP
+                && struct_exists(global.flags, "29")
+                && struct_exists(global.flags, "21")
+                && !struct_exists(global.flags, "22")) {
+                    with (obj_enemy) {
+                        if (invisibility_group >= 1 && invisibility_group <= 5)
+                            visible = true;
+                    }
+                    global.flags[$ "22"] = true;
+                    global.thunder_timer = 60;
+                    audio_play_sound(snd_got_thunder, 4, false);
+                }
+                return true;
             case 212:
             case 213:
             case 214:
@@ -293,8 +338,20 @@ function special_tile_player(grid_x, grid_y, tile_id, proposed_x, proposed_y) {
                 }
                 return false;
 
-            case 203: return true;  // story/object trigger
-            case 204: return true;  // ending edge
+            case 203:
+                var _ep3_trigger = "ep3_object_tile";
+                if (global.quest_object == 5) {
+                    global.quest_object = 0;
+                    global.flags[$ _ep3_trigger] = true;
+                    dialogue_start(2012, spr_dialogue_odin);
+                } else if (!struct_exists(global.flags, _ep3_trigger)) {
+                    global.flags[$ _ep3_trigger] = true;
+                    dialogue_start(2011, spr_dialogue_odin);
+                }
+                return true;
+            case 204:
+                if (proposed_x < 4) global.episode_complete = true;
+                return true;
             case 211:
             case 212:
             case 213:

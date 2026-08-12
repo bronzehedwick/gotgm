@@ -142,12 +142,28 @@ function enemy_fire_pattern(shooter) {
             }
             break;
 
-        case 6:
-            if (abs(_dx) < 16 && abs(_dy) < 24) {
-                if (abs(_dx) > abs(_dy)) _dir = (_dx < 0) ? Dir.LEFT : Dir.RIGHT;
-                else _dir = (_dy < 0) ? Dir.UP : Dir.DOWN;
-                _fire = true;
+        case 5: // serpent boss: random leftward breath between lunges
+            if (shooter.boss_state == 0 && irandom(99) < 15) {
+                shooter.shots_allowed = 3 + global.difficulty;
+                var _snake_shot = enemy_spawn_shot(shooter, Dir.LEFT, false);
+                if (_snake_shot != noone) {
+                    _snake_shot.x = shooter.x;
+                    _snake_shot.y = shooter.y + 16;
+                    audio_play_sound(snd_got_braapp, 2, false);
+                    shooter.shot_cooldown = 50;
+                }
             }
+            return;
+
+        case 6:
+            var _shooter_pos = (shooter.x div TILE_W)
+                + (shooter.y div TILE_H) * GRID_COLS;
+            var _player_pos = (global.player.x div TILE_W)
+                + (global.player.y div TILE_H) * GRID_COLS;
+            if (_player_pos == _shooter_pos - GRID_COLS) { _dir = Dir.UP; _fire = true; }
+            else if (_player_pos == _shooter_pos + GRID_COLS) { _dir = Dir.DOWN; _fire = true; }
+            else if (_player_pos == _shooter_pos - 1) { _dir = Dir.LEFT; _fire = true; }
+            else if (_player_pos == _shooter_pos + 1) { _dir = Dir.RIGHT; _fire = true; }
             break;
 
         case 8:

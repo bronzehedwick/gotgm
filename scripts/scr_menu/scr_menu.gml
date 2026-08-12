@@ -72,6 +72,24 @@ function menu_open_pause() {
     ], "pause");
 }
 
+function menu_show_ending(episode) {
+    var _chapter = [
+        "Serpent Surprise!",
+        "Non-stick Nognir",
+        "Lookin'' for Loki"
+    ];
+    menu_show_page("ending", "Episode Complete", [
+        "Part " + string(episode) + ": " + _chapter[episode - 1],
+        "",
+        "Score: " + string(global.score),
+        "",
+        (episode < 3) ? "Thor''s quest continues..." : "Asgard is safe once more!",
+        "",
+        "Enter or Escape: Opening Screen"
+    ]);
+    music_play_victory();
+}
+
 function menu_close() {
     global.menu.active = false;
     global.menu.mode = "none";
@@ -87,7 +105,7 @@ function menu_message(text) {
 function menu_save_game() {
     checkpoint_save();
     var _save = {
-        version: 1,
+        version: 2,
         checkpoint: global.checkpoint,
         flags: global.flags,
         inventory: global.inventory,
@@ -133,6 +151,8 @@ function menu_begin_game(episode, demo_playback = false) {
     var _magic = 0;
     var _selected_item = 0;
     var _inventory = {};
+    var _armor_level = 0;
+    var _hammer_damage = 10;
 
     switch (episode) {
         case 2:
@@ -143,6 +163,8 @@ function menu_begin_game(episode, demo_playback = false) {
             _selected_item = 1;
             _inventory.item_1 = true;
             _inventory.item_2 = true;
+            _armor_level = 1;
+            _hammer_damage = 13;
             break;
 
         case 3:
@@ -155,6 +177,8 @@ function menu_begin_game(episode, demo_playback = false) {
             _inventory.item_2 = true;
             _inventory.item_3 = true;
             _inventory.item_4 = true;
+            _armor_level = 2;
+            _hammer_damage = 17;
             break;
     }
 
@@ -187,13 +211,29 @@ function menu_begin_game(episode, demo_playback = false) {
     global.collected_pickups = {};
     global.selected_item = _selected_item;
     global.quest_object = 0;
+    global.armor_level = _armor_level;
+    global.hammer_damage = _hammer_damage;
     global.flags = {};
     global.tile_overrides = {};
+    global.post_boss_stage = 0;
+    global.post_boss_episode = 0;
+    global.endgame_active = false;
+    global.endgame_timer = 0;
+    global.endgame_tiles = [];
+    global.endgame_tile_index = 0;
+    global.episode_complete = false;
+    global.lightning_timer = 0;
+    global.thunder_timer = 0;
+    global.tornado_timer = 0;
+    global.tornado_instance = noone;
+    global.shield_on = false;
+    global.slip_active = false;
     global.checkpoint = {
         episode: episode, level: _level, x: _x, y: _y, facing: Dir.DOWN,
         health: _health, magic: _magic, jewels: _jewels, keys: 0, score: _score,
         selected_item: _selected_item, quest_object: 0,
         inventory_json: json_stringify(_inventory),
+        armor_level: _armor_level, hammer_damage: _hammer_damage,
     };
 
     global.demo_active = demo_playback;
@@ -419,7 +459,8 @@ function menu_update() {
         return;
     }
 
-    if (_m.mode == "high_scores" || _m.mode == "credits" || _m.mode == "bbs_info") {
+    if (_m.mode == "high_scores" || _m.mode == "credits" || _m.mode == "bbs_info"
+    || _m.mode == "ending") {
         if (keyboard_check_pressed(vk_escape) || keyboard_check_pressed(vk_enter)
         || keyboard_check_pressed(vk_space)) menu_show_title();
         return;
@@ -541,7 +582,8 @@ function menu_draw() {
     draw_set_alpha(1);
 
     if (_m.mode == "help") menu_draw_help();
-    else if (_m.mode == "high_scores" || _m.mode == "credits" || _m.mode == "bbs_info")
+    else if (_m.mode == "high_scores" || _m.mode == "credits" || _m.mode == "bbs_info"
+    || _m.mode == "ending")
         menu_draw_page();
     else menu_draw_box();
 }

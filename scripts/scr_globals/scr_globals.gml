@@ -71,11 +71,27 @@ function game_init() {
     global.magic_use_timer = 0;
     global.tornado_timer = 0;
     global.thunder_timer = 0;
+    global.lightning_timer = 0;
+    global.tornado_instance = noone;
     global.shield_on = false;
+    global.armor_level = 0;
+    global.hammer_damage = 10;
+    global.post_boss_stage = 0;
+    global.post_boss_episode = 0;
+    global.endgame_active = false;
+    global.endgame_timer = 0;
+    global.endgame_tiles = [];
+    global.endgame_tile_index = 0;
+    global.episode_complete = false;
+    global.slip_active = false;
+    global.slip_direction = Dir.DOWN;
+    global.slip_charge = 0;
+    global.slip_timer = 0;
     global.checkpoint = {
         episode: 1, level: 23, x: 128, y: 95, facing: Dir.DOWN,
         health: 150, magic: 0, jewels: 0, keys: 0, score: 0,
         selected_item: 0, quest_object: 0, inventory_json: "{}",
+        armor_level: 0, hammer_damage: 10,
     };
 
     display_set_gui_size(SCREEN_W, FULL_SCREEN_H);

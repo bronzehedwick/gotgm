@@ -18,7 +18,15 @@ if (_input.item_next) magic_select_next();
 var _magic_just_pressed = _input.magic && !magic_was_down;
 magic_update(_input.magic, _magic_just_pressed);
 magic_was_down = _input.magic;
-if (global.thunder_timer > 0) global.thunder_timer--;
+
+if (global.current_episode == 2 && global.slip_active) {
+    _input.up = false;
+    _input.left = false;
+    _input.right = false;
+    _input.down = true;
+    global.slip_timer--;
+    if (global.slip_timer <= 0) global.slip_active = false;
+}
 
 if (invulnerable_timer > 0) invulnerable_timer--;
 if (hammer_cooldown > 0) hammer_cooldown--;
@@ -65,6 +73,22 @@ if (_dy != 0) {
     }
 }
 
+if (global.current_episode == 2) {
+    var _floor_tile = tile_get((x + 7) div TILE_W, (y + 12) div TILE_H);
+    if (_floor_tile == 204 && !struct_exists(global.flags, "19")) {
+        if (!global.slip_active) {
+            global.slip_charge++;
+            if (global.slip_charge > 8) {
+                global.slip_active = true;
+                global.slip_timer = 8;
+                audio_play_sound(snd_got_fall, 2, false);
+            }
+        }
+    } else if (!global.slip_active) {
+        global.slip_charge = 0;
+    }
+}
+
 if (is_moving) {
     anim_timer++;
     if (anim_timer >= anim_speed) {
@@ -93,7 +117,7 @@ if (_input.fire && hammer_cooldown <= 0) {
 
 if (invulnerable_timer <= 0) {
     var _enemy = instance_place(x, y, obj_enemy);
-    if (_enemy != noone && _enemy.visible) {
+    if (_enemy != noone && _enemy.visible && !_enemy.is_magic_effect) {
         if (!actor_trigger_special(_enemy, false)) {
             combat_player_hit(_enemy.strength);
         }

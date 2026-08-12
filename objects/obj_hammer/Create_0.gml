@@ -4,7 +4,7 @@ move_speed = 4;
 returning = false;
 outbound_timer = 45;
 return_axis_toggle = false;
-damage = 10;
+damage = global.hammer_damage;
 
 // Sprite arrays follow the original UP, DOWN, LEFT, RIGHT direction order.
 dir_sprites = [

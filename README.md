@@ -77,7 +77,8 @@ Implemented and compiling in GameMaker 2024.14:
 - room-edge transitions, collision ranges, doors, gates, holes, teleports, and
   episode-specific special tiles
 - returning hammer, combat damage, enemy firing, common original movement
-  patterns, pickups, persistent collected items, checkpoint respawn
+  patterns, source-style death spins/explosions, pickups, runtime drop rules,
+  persistent placed items, and checkpoint respawn
 - original pushable blocks, recharge angels, switches, rolling boulders and
   directional barrels, wall-following spinballs, and multipart troll movement
 - all episode-specific dialogue `EXEC` helpers, including mining, arrest
@@ -85,7 +86,8 @@ Implemented and compiling in GameMaker 2024.14:
 - multipart snake, skull, and Loki encounters with source-aligned phase changes,
   attacks, dialogue, boss meter, and persistent defeat state
 - six inventory items with original costs/timing, including persistent tornado,
-  sequential thunder damage, shield art, and lightning/thunder presentation
+  sequential thunder damage, shield art, charged tornado startup, ten-flash
+  lightning, and source-pattern thunder screen shake
 - all 16 original digitized sound effects and the original music tracks
 - original-style opening/options menus, the original Episode 1 scrolling story,
   music controls, skill setting, help, and JSON save/load
@@ -94,10 +96,15 @@ Implemented and compiling in GameMaker 2024.14:
   numeric/string variables, branching, subroutines, loops, flags, quest items,
   stat changes, sound cues, actor reveals, and persistent scripted tile changes
 - source-aligned boss rewards and closing dialogue, silver/golden armor and
-  hammer progression, exit opening, Episode 3 collapse, and completion screens
+  hammer artwork/progression, staged boss deaths, exit opening, the row-shifting
+  Episode 3 collapse, and completion screens
+- source-specific serpent, wraith, skull, Loki, fish, rat, spear, stalactite,
+  boulder, spinball, and multipart-troll movement/projectile details
 
-Still incomplete compared with the published DOS game:
+Known platform-level differences from the published DOS executable:
 
-- frame-perfect DOS palette rotations and timing during boss introductions/deaths
-- the illustrated DOS ending presentation (completion and progression are functional)
-- byte-identical tornado/thunder display effects and a few less-used projectile details
+- VGA page offsets and palette effects are software-rendered equivalents; their
+  source counts and gameplay timing are preserved, but they cannot be
+  byte-identical to writes against DOS Mode X hardware.
+- After Episode 3 the DOS executable exits to the trilogy launcher with
+  `/SCORE`; this standalone port presents the completion result in-project.

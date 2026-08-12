@@ -1,5 +1,6 @@
 /// @description Enemy projectile update
 if (global.menu.active) exit;
+if (global.death_active) exit;
 speed_count++;
 if (speed_count >= shot_speed) {
     speed_count = 0;
@@ -18,7 +19,9 @@ if (speed_count >= shot_speed) {
     frame_count++;
     if (frame_count >= shot_frame_speed && shot_move != 9) {
         frame_count = 0;
-        current_frame = (current_frame + 1) mod array_length(shot_sequence);
+        if (shot_move == 12) current_frame = (current_frame + 1) mod min(2, array_length(shot_sequence));
+        else if (shot_move == 13) current_frame = 2 + ((current_frame - 1) mod 2);
+        else current_frame = (current_frame + 1) mod array_length(shot_sequence);
     }
 }
 
@@ -34,6 +37,26 @@ if (global.player != noone && instance_exists(global.player)
                           global.player.x, global.player.y,
                           global.player.x + global.player.col_w,
                           global.player.y + global.player.col_h)) {
-    combat_player_hit(shot_strength);
-    if (shot_move != 7 && shot_move != 8) instance_destroy();
+    switch (shot_move) {
+        case 1:
+        case 2:
+        case 4:
+        case 10:
+        case 11:
+            combat_player_hit(shot_strength);
+            instance_destroy();
+            break;
+        case 3:
+            combat_player_hit(shot_strength);
+            shot_move = 0;
+            shot_speed = 6;
+            x += 2;
+            break;
+        case 7:
+        case 8:
+        case 12:
+        case 13:
+            combat_player_hit(shot_strength);
+            break;
+    }
 }

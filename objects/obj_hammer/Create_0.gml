@@ -6,13 +6,9 @@ outbound_timer = 45;
 return_axis_toggle = false;
 damage = global.hammer_damage;
 
-// Sprite arrays follow the original UP, DOWN, LEFT, RIGHT direction order.
-dir_sprites = [
-    spr_hammer_down,
-    spr_hammer_up,
-    spr_hammer_left,
-    spr_hammer_right,
-];
-
-sprite_index = dir_sprites[facing];
-image_speed = 1;
+sprite_index = (damage <= 10) ? spr_actor_103_hammeri
+    : ((damage <= 13) ? spr_actor_104_hammers : spr_actor_113_hammerg);
+hammer_anim_frame = 0;
+hammer_anim_timer = 0;
+image_index = facing * 4;
+image_speed = 0;

@@ -1,4 +1,19 @@
 /// @description Original 320x48 status panel
+// THUNDER.C moves the displayed VGA page by one pixel/scanline. Redrawing the
+// application surface with the same four offsets recreates that screen shake.
+if (global.thunder_timer > 0 && surface_exists(application_surface)) {
+    var _thunder_phase = global.thunder_timer mod 4;
+    var _thunder_x = 0;
+    var _thunder_y = 0;
+    if (_thunder_phase == 0) _thunder_x = -1;
+    else if (_thunder_phase == 1) _thunder_x = 1;
+    else if (_thunder_phase == 2) _thunder_y = -1;
+    else _thunder_y = 1;
+    draw_set_colour(c_black);
+    draw_rectangle(0, 0, SCREEN_W - 1, SCREEN_H - 1, false);
+    draw_surface(application_surface, _thunder_x, _thunder_y);
+}
+
 var _panel_y = SCREEN_H;
 draw_sprite(spr_status_bar, 0, 0, _panel_y);
 
@@ -60,32 +75,45 @@ if (_boss != noone && instance_exists(_boss)) {
     }
 }
 
-// The source uses palette/display-page effects for these spells. Procedural
-// lines and flashes preserve the timing without requiring new replacement art.
+// LIGHT.C draws ten flashes of eight 24-pixel random walks. A deterministic
+// integer pattern keeps the original shape and timing without flickering when
+// GameMaker redraws a frame more than once.
 if (global.lightning_timer > 0 && global.player != noone
 && instance_exists(global.player)) {
     var _origin_x = global.player.x + 7;
     var _origin_y = global.player.y + 8;
-    draw_set_colour(((global.lightning_timer div 2) & 1) ? c_white : c_yellow);
-    for (var _ray = 0; _ray < 8; _ray++) {
-        var _px = _origin_x;
-        var _py = _origin_y;
-        for (var _bolt = 1; _bolt <= 5; _bolt++) {
-            var _angle = _ray * 45 + ((_bolt + global.lightning_timer) mod 3 - 1) * 10;
-            var _nx = _origin_x + lengthdir_x(_bolt * 12, _angle);
-            var _ny = _origin_y + lengthdir_y(_bolt * 12, _angle);
-            draw_line(_px, _py, _nx, _ny);
-            _px = _nx;
-            _py = _ny;
+    var _flash = (60 - global.lightning_timer) div 6;
+    if (((60 - global.lightning_timer) mod 6) < 3) {
+        draw_set_colour((_flash & 1) ? c_white : c_yellow);
+        for (var _ray = 0; _ray < 8; _ray++) {
+            var _px = _origin_x;
+            var _py = _origin_y;
+            for (var _bolt = 0; _bolt < 24; _bolt++) {
+                var _choice3 = (_flash * 97 + _ray * 31 + _bolt * 17) mod 3;
+                var _choice2 = (_flash * 53 + _ray * 19 + _bolt * 11) mod 2;
+                switch (_ray) {
+                    case 0: _py--; _px += _choice3 - 1; break;
+                    case 1:
+                        if (_choice2 == 0) _px++; else _py--;
+                        break;
+                    case 2: _px++; _py += _choice3 - 1; break;
+                    case 3:
+                        if (_choice2 == 0) _px++; else _py++;
+                        break;
+                    case 4: _py++; _px += _choice3 - 1; break;
+                    case 5:
+                        if (_choice2 == 0) _px--; else _py++;
+                        break;
+                    case 6: _px--; _py += _choice3 - 1; break;
+                    case 7:
+                        if (_choice2 == 0) _px--; else _py--;
+                        break;
+                }
+                if (_px >= 0 && _px < SCREEN_W && _py >= 0 && _py < SCREEN_H)
+                    draw_point(_px, _py);
+            }
         }
     }
-}
-
-if (global.thunder_timer > 0 && ((global.thunder_timer div 2) & 1)) {
-    draw_set_alpha(0.22);
-    draw_set_colour(c_white);
-    draw_rectangle(0, 0, SCREEN_W - 1, SCREEN_H - 1, false);
-    draw_set_alpha(1);
 }
 
 draw_set_colour(c_white);

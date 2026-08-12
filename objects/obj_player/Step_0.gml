@@ -8,7 +8,24 @@ if (global.dialogue.active) {
 }
 
 if (global.health <= 0) {
-    checkpoint_restore();
+    if (!global.death_active) {
+        global.death_active = true;
+        global.death_timer = 0;
+        audio_play_sound(snd_got_dead, 5, false);
+        if (global.hammer != noone && instance_exists(global.hammer))
+            instance_destroy(global.hammer);
+        global.hammer = noone;
+        magic_destroy_tornado();
+        global.shield_on = false;
+    }
+    global.death_timer++;
+    var _spin_order = [Dir.UP, Dir.LEFT, Dir.DOWN, Dir.RIGHT];
+    facing = _spin_order[(global.death_timer div 5) mod 4];
+    sprite_index = (global.armor_level <= 0) ? spr_actor_100_thor_lth
+        : ((global.armor_level == 1) ? spr_actor_101_thor_lth : spr_actor_110_thor_gld);
+    image_index = facing * 4;
+    image_speed = 0;
+    if (global.death_timer >= 60) checkpoint_restore();
     exit;
 }
 
@@ -35,6 +52,8 @@ var _dx = 0;
 var _dy = 0;
 is_moving = false;
 input_diagonal = false;
+input_vertical_dir = _input.up ? Dir.UP : (_input.down ? Dir.DOWN : -1);
+input_horizontal_dir = _input.left ? Dir.LEFT : (_input.right ? Dir.RIGHT : -1);
 
 // MOVPAT.C gives horizontal facing priority for diagonal movement.
 if (_input.up && _input.left) {
@@ -100,8 +119,9 @@ if (is_moving) {
     anim_timer = 0;
 }
 
-sprite_index = dir_sprites[facing];
-image_index = anim_frame;
+sprite_index = (global.armor_level <= 0) ? spr_actor_100_thor_lth
+    : ((global.armor_level == 1) ? spr_actor_101_thor_lth : spr_actor_110_thor_gld);
+image_index = facing * 4 + anim_frame;
 image_speed = 0;
 
 if (_input.fire && hammer_cooldown <= 0) {
@@ -120,6 +140,7 @@ if (invulnerable_timer <= 0) {
     if (_enemy != noone && _enemy.visible && !_enemy.is_magic_effect) {
         if (!actor_trigger_special(_enemy, false)) {
             combat_player_hit(_enemy.strength);
+            if (_enemy.move_pattern == 18) _enemy.hit_player = true;
         }
     }
 }

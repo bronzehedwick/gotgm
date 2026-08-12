@@ -19,6 +19,7 @@ function level_enter_current_room() {
     global.slip_active = false;
     global.slip_charge = 0;
     global.slip_timer = 0;
+    global.boss_death_active = false;
 
     var _episode = real(string_copy(_room_name, 6, 1));
     var _level_index = real(string_copy(_room_name, 8, 3));

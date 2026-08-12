@@ -51,6 +51,8 @@ function actor_configure(inst, actor_type, value, dir, invisible, source_slot = 
         axis_toggle = false;
         ai_timer = irandom_range(50, 149);
         ai_seek = false;
+        hit_player = false;
+        bite_speed_timer = 0;
         boss_state = 0;
         boss_timer = 0;
         boss_counter = 0;
@@ -58,10 +60,15 @@ function actor_configure(inst, actor_type, value, dir, invisible, source_slot = 
         boss_invulnerable = false;
         boss_destroyed_tiles = [];
         is_magic_effect = false;
+        is_tornado = false;
+        is_boss_explosion = false;
         magic_hit_cooldown = 0;
         spear_timer = 0;
         spear_phase = 0;
         fish_pause = 0;
+        fish_cooldown = 0;
+        fish_descending = false;
+        fish_direction = Dir.UP;
         trap_falling = false;
         dart_initialized = false;
         dart_timer = 0;
@@ -100,6 +107,9 @@ function actor_get_definition(actor_type) {
 
 function pickup_spawn(obj_type, px, py) {
     var _inst = instance_create_layer(px, py, "Pickups", obj_pickup);
-    with (_inst) pickup_type = obj_type;
+    with (_inst) {
+        pickup_type = obj_type;
+        persistent_pickup = false;
+    }
     return _inst;
 }

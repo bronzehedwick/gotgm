@@ -227,61 +227,157 @@ function move_mushroom() {
 }
 
 function move_bite_run() {
+    if (bite_speed_timer > 0) {
+        bite_speed_timer--;
+        if (bite_speed_timer <= 0) num_moves = 1;
+    }
     if (ai_timer <= 0) {
         ai_timer = irandom_range(50, 149);
         ai_seek = !ai_seek;
     }
-    ai_timer--;
+
     if (ai_seek) move_seek_player();
     else move_walk_bump_random();
+    ai_timer--;
+
+    if (hit_player) {
+        hit_player = false;
+        bite_speed_timer = 50;
+        num_moves = 2;
+        facing = move_reverse_direction(facing);
+        if (ai_seek) {
+            ai_seek = false;
+            ai_timer = irandom_range(50, 149);
+        }
+    }
 }
 
 function move_spear() {
-    // The spear extends over four source frames, remains harmful briefly, then retracts.
-    spear_timer++;
-    if (spear_timer >= 16) {
-        spear_timer = 0;
-        spear_phase = (spear_phase + 1) mod 4;
+    // The trap extends, holds for ten movement counts, retracts, pauses, then
+    // advances diagonally around its sequence of wall anchors.
+    var _redo = true;
+    var _guard = 0;
+    while (_redo && _guard++ < 16) {
+        _redo = false;
+        switch (spear_phase) {
+            case 0:
+                if (tile_get(x div TILE_W, y div TILE_H) >= TILE_SOLID) {
+                    current_frame = 1;
+                    spear_phase = 1;
+                } else {
+                    spear_phase = 6;
+                    spear_timer = 1;
+                    _redo = true;
+                }
+                break;
+            case 1:
+                current_frame = 2;
+                spear_phase = 2;
+                break;
+            case 2:
+                current_frame = 3;
+                strength = 255;
+                spear_phase = 3;
+                spear_timer = 10;
+                break;
+            case 3:
+                spear_timer--;
+                if (spear_timer <= 0) {
+                    spear_phase = 4;
+                    current_frame = 2;
+                }
+                break;
+            case 4:
+                strength = 0;
+                spear_phase = 5;
+                current_frame = 1;
+                break;
+            case 5:
+                spear_phase = 6;
+                current_frame = 0;
+                spear_timer = 10;
+                break;
+            case 6:
+                spear_timer--;
+                if (spear_timer <= 0) {
+                    spear_phase = 0;
+                    current_frame = 0;
+                    switch (facing) {
+                        case Dir.UP:    x += 16; y += 16; facing = Dir.RIGHT; break;
+                        case Dir.DOWN:  x -= 16; y -= 16; facing = Dir.LEFT; break;
+                        case Dir.LEFT:  x += 16; y -= 16; facing = Dir.UP; break;
+                        case Dir.RIGHT: x -= 16; y += 16; facing = Dir.DOWN; break;
+                    }
+                    if (tile_get(x div TILE_W, y div TILE_H) < TILE_SOLID)
+                        _redo = true;
+                }
+                break;
+        }
     }
-    current_frame = min(spear_phase, max(0, array_length(frame_sequence) - 1));
-    strength = (spear_phase == 3) ? 255 : actor_def.strength;
 }
 
 function move_fish() {
-    if (fish_pause > 0) {
-        fish_pause--;
-        return;
-    }
-
-    var _dx = 0;
-    var _dy = 0;
-    switch (facing) {
-        case Dir.UP: _dy = -2; break;
-        case Dir.DOWN: _dy = 2; break;
-        case Dir.LEFT: _dx = -2; break;
-        case Dir.RIGHT: _dx = 2; break;
-    }
-
-    var _nx = x + _dx;
-    var _ny = y + _dy;
-    var _allowed = true;
-    var _corners = [
-        tile_get(_nx div TILE_W, _ny div TILE_H),
-        tile_get((_nx + col_w - 1) div TILE_W, _ny div TILE_H),
-        tile_get(_nx div TILE_W, (_ny + col_h - 1) div TILE_H),
-        tile_get((_nx + col_w - 1) div TILE_W, (_ny + col_h - 1) div TILE_H)
-    ];
-    for (var _i = 0; _i < 4; _i++) {
-        var _t = _corners[_i];
-        if (_t != 100 && _t != 106 && _t != 110 && _t != 111 && _t != 113) _allowed = false;
-    }
-
-    if (_allowed) {
-        x = _nx;
-        y = _ny;
+    if (fish_cooldown > 0) {
+        fish_cooldown--;
+        var _delta = move_direction_delta(fish_direction);
+        var _nx = x + _delta[0];
+        var _ny = y + _delta[1];
+        var _allowed = true;
+        var _corners = [
+            tile_get(_nx div TILE_W, _ny div TILE_H),
+            tile_get((_nx + col_w - 1) div TILE_W, _ny div TILE_H),
+            tile_get(_nx div TILE_W, (_ny + col_h - 1) div TILE_H),
+            tile_get((_nx + col_w - 1) div TILE_W, (_ny + col_h - 1) div TILE_H)
+        ];
+        for (var _i = 0; _i < 4; _i++) {
+            var _tile = _corners[_i];
+            if (_tile != 100 && _tile != 106 && _tile != 110
+            && _tile != 111 && _tile != 113) _allowed = false;
+        }
+        if (_allowed) {
+            x = _nx;
+            y = _ny;
+        } else fish_direction = irandom(3);
+    } else if (!fish_descending) {
+        if (current_frame == 0) {
+            frame_count = 1;
+            frame_speed = 4;
+        }
+        frame_count--;
+        if (frame_count <= 0) {
+            current_frame = (current_frame + 1) mod array_length(frame_sequence);
+            frame_count = frame_speed;
+        }
+        if (current_frame == 3) {
+            var _fish_shot_def = shot_get_definition(actor_type_id);
+            if (enemy_shot_count(id) < shots_allowed
+            && _fish_shot_def != undefined
+            && enemy_shot_line_clear(id, Dir.UP, _fish_shot_def.flying > 0)) {
+                var _fish_shot = enemy_spawn_embedded_shot(id, actor_type_id);
+                if (_fish_shot != noone) _fish_shot.facing = Dir.UP;
+            }
+            fish_descending = true;
+        }
     } else {
-        facing = irandom(3);
-        fish_pause = irandom_range(15, 45);
+        frame_count--;
+        if (frame_count <= 0) {
+            current_frame--;
+            frame_count = frame_speed;
+            if (current_frame <= 0) {
+                current_frame = 0;
+                fish_descending = false;
+                frame_speed = 4;
+                fish_cooldown = irandom_range(60, 159);
+            }
+        }
+    }
+
+    if (current_frame > 0) {
+        solid_type = 1;
+        strength = actor_def.strength;
+    } else {
+        solid_type = 2;
+        strength = 0;
     }
 }
 
@@ -301,9 +397,21 @@ function move_falling_trap() {
     if (!trap_falling) {
         if (global.player != noone && instance_exists(global.player)
         && global.player.y > y && abs(global.player.x - x) < 16) {
-            trap_falling = true;
-            num_moves = max(1, pass_value + 1);
-            audio_play_sound(snd_got_fall, 1, false);
+            var _column = (x + col_w * 0.5) div TILE_W;
+            var _from_row = (y + col_h - 2) div TILE_H;
+            var _to_row = (global.player.y + global.player.col_h * 0.5) div TILE_H;
+            var _clear = true;
+            for (var _row = _from_row; _row <= _to_row; _row++) {
+                if (tile_get(_column, _row) < TILE_SOLID) {
+                    _clear = false;
+                    break;
+                }
+            }
+            if (_clear) {
+                trap_falling = true;
+                num_moves = max(1, pass_value + 1);
+                audio_play_sound(snd_got_fall, 1, false);
+            }
         }
         return;
     }
@@ -311,6 +419,8 @@ function move_falling_trap() {
     if (!move_try(0, 2)) {
         health = 0;
         is_dead = true;
+        combat_spawn_death_effect(id);
+        combat_drop_loot(id);
         instance_destroy();
     }
 }
@@ -363,10 +473,13 @@ function move_timed_dart() {
 }
 
 function move_effect() {
+    current_frame = (current_frame + 1) mod min(3, array_length(frame_sequence));
     effect_timer--;
     if (effect_timer <= 0) {
         is_dead = true;
         instance_destroy();
+    } else if (is_boss_explosion && current_frame == 0) {
+        audio_play_sound(snd_got_explode, 3, false);
     }
 }
 
@@ -588,6 +701,8 @@ function move_loki_boss() {
             if (_first_shot != noone) {
                 _first_shot.x = x + 8;
                 _first_shot.y = y - 8;
+                _first_shot.motion_delay = 30;
+                _first_shot.life_timer = irandom_range(90, 189);
             }
             audio_play_sound(snd_got_electric, 3, false);
         }
@@ -717,6 +832,8 @@ function move_skull_boss() {
                 _shot.x = x + 12;
                 _shot.y = y + 32;
                 _shot.shot_move = 7;
+                _shot.drop_wait = 4;
+                _shot.drop_interval = 4;
             }
             audio_play_sound(snd_got_fall, 2, false);
             boss_timer = 40;

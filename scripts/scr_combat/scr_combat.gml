@@ -23,7 +23,6 @@ function checkpoint_save() {
 
 function checkpoint_restore() {
     var _save = global.checkpoint;
-    audio_play_sound(snd_got_dead, 5, false);
 
     if (global.hammer != noone && instance_exists(global.hammer)) instance_destroy(global.hammer);
     global.hammer = noone;
@@ -43,6 +42,8 @@ function checkpoint_restore() {
         ? _save.hammer_damage : ((_save.episode == 1) ? 10 : ((_save.episode == 2) ? 13 : 17));
     global.current_episode = _save.episode;
     global.current_level = _save.level;
+    global.death_active = false;
+    global.death_timer = 0;
 
     if (global.player != noone && instance_exists(global.player)) {
         global.player.x = _save.x;
@@ -53,6 +54,47 @@ function checkpoint_restore() {
 
     var _target = level_room_asset(_save.episode, _save.level);
     if (_target != -1) room_goto(_target);
+}
+
+function combat_spawn_death_effect(enemy_inst) {
+    if (!instance_exists(enemy_inst) || enemy_inst.actor_def == undefined) return;
+    var _effect_type = (enemy_inst.actor_def.func_num == 255) ? 107 : 106;
+    var _effect = actor_spawn(_effect_type, enemy_inst.x, enemy_inst.y, 0, Dir.UP);
+    if (_effect == noone) return;
+    _effect.is_magic_effect = true;
+    _effect.solid_type |= 128;
+    _effect.strength = 0;
+    _effect.actor_slot = -1;
+    _effect.effect_timer = 4;
+}
+
+function combat_spawn_boss_explosion(px, py, frame) {
+    var _effect = actor_spawn(107, px, py, 0, Dir.UP);
+    if (_effect == noone) return;
+    _effect.is_magic_effect = true;
+    _effect.is_boss_explosion = true;
+    _effect.solid_type |= 128;
+    _effect.strength = 0;
+    _effect.actor_slot = -1;
+    _effect.current_frame = frame mod 3;
+    _effect.move_delay = irandom_range(6, 8);
+    _effect.effect_timer = (10 - _effect.move_delay) * 10;
+}
+
+function combat_spawn_collapse_explosion(tile_position) {
+    var _effect = actor_spawn(
+        107,
+        (tile_position mod GRID_COLS) * TILE_W,
+        (tile_position div GRID_COLS) * TILE_H,
+        0,
+        Dir.UP
+    );
+    if (_effect == noone) return;
+    _effect.is_magic_effect = true;
+    _effect.solid_type |= 128;
+    _effect.strength = 0;
+    _effect.actor_slot = -1;
+    _effect.effect_timer = 6;
 }
 
 function combat_player_hit(damage) {
@@ -163,6 +205,7 @@ function combat_enemy_hit(enemy_inst, damage) {
             global.score = min(global.score + enemy_inst.actor_def.rating, MAX_SCORE);
         }
         combat_drop_loot(enemy_inst);
+        combat_spawn_death_effect(enemy_inst);
         with (enemy_inst) instance_destroy();
     }
 }
@@ -208,6 +251,21 @@ function combat_begin_boss_closing() {
 }
 
 function combat_update_progression() {
+    if (global.boss_death_active) {
+        var _explosions_alive = false;
+        for (var _death_i = 0; _death_i < instance_number(obj_enemy); _death_i++) {
+            var _death_actor = instance_find(obj_enemy, _death_i);
+            if (_death_actor != noone && _death_actor.is_boss_explosion) {
+                _explosions_alive = true;
+                break;
+            }
+        }
+        if (!_explosions_alive) {
+            global.boss_death_active = false;
+            combat_begin_boss_closing();
+        }
+    }
+
     if (global.post_boss_stage == 1 && !global.dialogue.active) {
         var _episode = global.post_boss_episode;
         combat_reward_episode(_episode);
@@ -219,6 +277,8 @@ function combat_update_progression() {
             global.endgame_active = true;
             global.endgame_timer = 0;
             global.endgame_tile_index = 0;
+            global.endgame_row = 0;
+            global.endgame_phase = 0;
             global.endgame_tiles = [
                 126,127,128,129,130,131,132,133,
                 146,147,148,149,150,151,152,153,
@@ -239,17 +299,59 @@ function combat_update_progression() {
     if (global.endgame_active && global.current_episode == 3
     && global.current_level == 106) {
         global.endgame_timer++;
-        if (global.endgame_timer >= 8
+        if (global.endgame_timer >= 6
         && global.endgame_tile_index < array_length(global.endgame_tiles)) {
             global.endgame_timer = 0;
-            var _position = global.endgame_tiles[global.endgame_tile_index++];
+            var _row_start = (global.endgame_phase == 0)
+                ? global.endgame_row * 8 : 0;
+            var _row_end = (global.endgame_phase == 0)
+                ? _row_start + 7 : array_length(global.endgame_tiles) - 1;
+            var _pick = irandom_range(global.endgame_tile_index, _row_end);
+            var _position = global.endgame_tiles[_pick];
+            global.endgame_tiles[_pick] = global.endgame_tiles[global.endgame_tile_index];
+            global.endgame_tiles[global.endgame_tile_index] = _position;
+            global.endgame_tile_index++;
             level_set_tile(
                 _position mod GRID_COLS,
                 _position div GRID_COLS,
                 global.current_level_metadata.bg_color
             );
-            if ((global.endgame_tile_index mod 4) == 1)
-                audio_play_sound(snd_got_explode, 3, false);
+            if (global.endgame_phase == 0) {
+                level_set_tile(
+                    (_position - 80) mod GRID_COLS,
+                    (_position - 80) div GRID_COLS,
+                    global.current_level_metadata.bg_color
+                );
+            }
+            combat_spawn_collapse_explosion(_position);
+            audio_play_sound(snd_got_explode, 3, false);
+
+            if (global.endgame_phase == 0
+            && global.endgame_tile_index >= (global.endgame_row + 1) * 8) {
+                // ENDGAME.C copies the five 8-tile bands down one tile after
+                // every row of explosions, producing the room collapse.
+                for (var _shift_y = 6 + global.endgame_row;
+                _shift_y >= 2 + global.endgame_row; _shift_y--) {
+                    for (var _shift_x = 6; _shift_x <= 13; _shift_x++) {
+                        level_set_tile(
+                            _shift_x,
+                            _shift_y,
+                            tile_get(_shift_x, _shift_y - 1)
+                        );
+                    }
+                }
+                global.endgame_row++;
+                if (global.endgame_row >= 4) {
+                    global.endgame_phase = 1;
+                    global.endgame_tile_index = 0;
+                    global.endgame_tiles = [
+                        126,127,128,129,130,131,132,133,
+                        146,147,148,149,150,151,152,153,
+                        166,167,168,169,170,171,172,173,
+                        186,187,188,189,190,191,192,193
+                    ];
+                }
+            }
         }
     }
 
@@ -331,7 +433,8 @@ function combat_boss_hit(enemy_inst, damage) {
 
     global.flags[$ "boss_" + string(global.current_episode) + "_" + string(global.current_level)] = true;
     audio_play_sound(snd_got_explode, 5, false);
-    combat_begin_boss_closing();
+    global.boss_death_active = true;
+    with (obj_enemy_shot) instance_destroy();
     for (var _j = instance_number(obj_enemy) - 1; _j >= 0; _j--) {
         var _victim = instance_find(obj_enemy, _j);
         if (_victim == noone) continue;
@@ -340,6 +443,7 @@ function combat_boss_hit(enemy_inst, damage) {
         || (_skull && _victim_type >= 31 && _victim_type <= 34)
         || (_loki && _victim_type >= 64 && _victim_type <= 67)) {
             _victim.is_dead = true;
+            combat_spawn_boss_explosion(_victim.x, _victim.y, _victim.actor_slot - 3);
             instance_destroy(_victim);
         }
     }

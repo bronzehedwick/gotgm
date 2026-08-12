@@ -69,7 +69,13 @@ if (!returning) {
     else facing = (_dy < 0) ? Dir.UP : Dir.DOWN;
 }
 
-sprite_index = dir_sprites[facing];
+hammer_anim_timer++;
+if (hammer_anim_timer >= 2) {
+    hammer_anim_timer = 0;
+    hammer_anim_frame = (hammer_anim_frame + 1) mod 4;
+}
+image_index = facing * 4 + hammer_anim_frame;
+image_speed = 0;
 
 // check_move1 in the DOS game uses a fixed 10x10 hammer rectangle and checks
 // every overlapping actor. A single instance_place could select an adjacent

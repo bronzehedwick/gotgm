@@ -82,7 +82,14 @@ function game_init() {
     global.endgame_timer = 0;
     global.endgame_tiles = [];
     global.endgame_tile_index = 0;
+    global.endgame_row = 0;
+    global.endgame_phase = 0;
     global.episode_complete = false;
+    global.death_active = false;
+    global.death_timer = 0;
+    global.boss_death_active = false;
+    global.projectile_drop_counter = 0;
+    global.tornado_charge = 0;
     global.slip_active = false;
     global.slip_direction = Dir.DOWN;
     global.slip_charge = 0;

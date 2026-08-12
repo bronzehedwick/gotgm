@@ -48,6 +48,7 @@ function magic_spawn_tornado() {
     _tornado.move_pattern = 16;
     _tornado.actor_slot = 2;
     _tornado.is_magic_effect = true;
+    _tornado.is_tornado = true;
     _tornado.is_flying = true;
     _tornado.solid_type |= 128;
     _tornado.strength = 20;
@@ -97,6 +98,7 @@ function magic_update(is_down, just_pressed) {
     global.player.move_speed = 2;
     if (!is_down) {
         global.magic_use_timer = 0;
+        global.tornado_charge = 0;
         global.shield_on = false;
         magic_destroy_tornado();
         return;
@@ -115,24 +117,29 @@ function magic_update(is_down, just_pressed) {
             }
             break;
 
-        case 2: // lightning: 15 magic, damages nearby actors
-            if (just_pressed && global.magic >= 15) {
+        case 2: // lightning: ten six-count flashes, repeatable while held
+            global.tornado_charge = 0;
+            if (global.lightning_timer <= 0 && global.magic >= 15) {
                 global.magic -= 15;
                 audio_play_sound(snd_got_electric, 4, false);
-                global.lightning_timer = 30;
+                global.lightning_timer = 60;
                 magic_area_damage(30, 254);
             }
             break;
 
         case 3: // speed boots: held, drains one magic every nine counts
+            global.tornado_charge = 0;
             if (global.magic > 0) {
                 global.player.move_speed = 4;
                 if (_pulse) global.magic--;
             }
             break;
 
-        case 4: // tornado: starts at 10 magic, then drains while held
-            if (just_pressed && global.magic > 10) {
+        case 4: // tornado: the DOS game charges for twenty counts first
+            global.tornado_charge++;
+            if ((global.tornado_instance == noone
+            || !instance_exists(global.tornado_instance))
+            && global.tornado_charge > 20 && global.magic > 10) {
                 global.magic -= 10;
                 if (magic_spawn_tornado())
                     audio_play_sound(snd_got_wind, 2, false);
@@ -145,6 +152,7 @@ function magic_update(is_down, just_pressed) {
             break;
 
         case 5: // shield: held, drains one magic every nine counts
+            global.tornado_charge = 0;
             if (global.magic > 0) {
                 global.shield_on = true;
                 if (_pulse) global.magic--;
@@ -152,6 +160,7 @@ function magic_update(is_down, just_pressed) {
             break;
 
         case 6: // thunder: 30 magic, one source-timed 60-count burst
+            global.tornado_charge = 0;
             if (just_pressed && global.magic > 29 && global.thunder_timer <= 0) {
                 global.magic -= 30;
                 global.thunder_timer = 60;

@@ -3,7 +3,7 @@ if (global.menu.active) exit;
 if (global.player == noone || !instance_exists(global.player)) exit;
 
 var _pickup_key = room_get_name(room) + "|" + string(round(x)) + "|" + string(round(y)) + "|" + string(pickup_type);
-if (struct_exists(global.collected_pickups, _pickup_key)) {
+if (persistent_pickup && struct_exists(global.collected_pickups, _pickup_key)) {
     instance_destroy();
     exit;
 }
@@ -86,6 +86,6 @@ switch (pickup_type) {
 
 if (_collected) {
     audio_play_sound(_pickup_sound, 0, false);
-    global.collected_pickups[$ _pickup_key] = true;
+    if (persistent_pickup) global.collected_pickups[$ _pickup_key] = true;
     instance_destroy();
 }

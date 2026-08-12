@@ -92,6 +92,26 @@ function enemy_spawn_shot(shooter, dir, ignore_walls) {
         y = shooter.y + (shooter.col_h - shot_h) * 0.5;
         angle_target_x = global.player.x;
         angle_target_y = global.player.y;
+        motion_delay = 0;
+        slow_counter = 0;
+        slow_period = 0;
+        drop_wait = 0;
+        drop_interval = 0;
+        drop_decay_counter = 0;
+        bounce_y_velocity = 0;
+        bounce_y_counter = 0;
+        bounce_curve_counter = 0;
+        bounce_down = false;
+        bounce_x_counter = 0;
+        bounce_x_right = false;
+        angle_x_step = 0;
+        angle_y_step = 0;
+        angle_x_distance = 0;
+        angle_y_distance = 0;
+        angle_major_y = false;
+        angle_counter = 0;
+        angle_initialized = false;
+        path_toggle = false;
         life_timer = 180;
     }
     shooter.shot_cooldown = 20;
@@ -111,6 +131,7 @@ function enemy_fire_pattern(shooter) {
     var _dir = shooter.facing;
     var _fire = false;
     var _ignore = false;
+    var _reverse_after_fire = false;
 
     switch (shooter.shot_pattern) {
         case 1:
@@ -133,12 +154,24 @@ function enemy_fire_pattern(shooter) {
             break;
 
         case 3:
-            if (abs(_dx) < 8) {
-                _dir = (_dy < 0) ? Dir.UP : Dir.DOWN;
-                _fire = (_dy != 0);
-            } else if (abs(_dy) < 8) {
-                _dir = (_dx < 0) ? Dir.LEFT : Dir.RIGHT;
-                _fire = (_dx != 0);
+            // Try the actor''s facing direction first. A successful forward
+            // shot turns the actor around; otherwise it may fire backward
+            // while retaining its original facing.
+            if ((_dir == Dir.UP && abs(_dx) < 8 && _dy < 0)
+            || (_dir == Dir.DOWN && abs(_dx) < 8 && _dy > 0)
+            || (_dir == Dir.LEFT && abs(_dy) < 8 && _dx < 0)
+            || (_dir == Dir.RIGHT && abs(_dy) < 8 && _dx > 0)) {
+                _fire = true;
+                _reverse_after_fire = true;
+            } else {
+                _dir = (_dir == Dir.UP) ? Dir.DOWN
+                    : ((_dir == Dir.DOWN) ? Dir.UP
+                    : ((_dir == Dir.LEFT) ? Dir.RIGHT : Dir.LEFT));
+                if ((_dir == Dir.UP && abs(_dx) < 8 && _dy < 0)
+                || (_dir == Dir.DOWN && abs(_dx) < 8 && _dy > 0)
+                || (_dir == Dir.LEFT && abs(_dy) < 8 && _dx < 0)
+                || (_dir == Dir.RIGHT && abs(_dy) < 8 && _dx > 0))
+                    _fire = true;
             }
             break;
 
@@ -149,6 +182,9 @@ function enemy_fire_pattern(shooter) {
                 if (_snake_shot != noone) {
                     _snake_shot.x = shooter.x;
                     _snake_shot.y = shooter.y + 16;
+                    _snake_shot.life_timer = 120;
+                    _snake_shot.slow_period = irandom_range(5, 21);
+                    _snake_shot.slow_counter = _snake_shot.slow_period;
                     audio_play_sound(snd_got_braapp, 2, false);
                     shooter.shot_cooldown = 50;
                 }
@@ -164,6 +200,7 @@ function enemy_fire_pattern(shooter) {
             else if (_player_pos == _shooter_pos + GRID_COLS) { _dir = Dir.DOWN; _fire = true; }
             else if (_player_pos == _shooter_pos - 1) { _dir = Dir.LEFT; _fire = true; }
             else if (_player_pos == _shooter_pos + 1) { _dir = Dir.RIGHT; _fire = true; }
+            if (_fire) shooter.current_frame = min(3, array_length(shooter.frame_sequence) - 1);
             break;
 
         case 8:
@@ -177,7 +214,14 @@ function enemy_fire_pattern(shooter) {
             break;
     }
 
-    if (_fire) enemy_spawn_shot(shooter, _dir, _ignore);
+    if (_fire) {
+        var _spawned = enemy_spawn_shot(shooter, _dir, _ignore);
+        if (_spawned != noone && _reverse_after_fire) {
+            shooter.facing = (shooter.facing == Dir.UP) ? Dir.DOWN
+                : ((shooter.facing == Dir.DOWN) ? Dir.UP
+                : ((shooter.facing == Dir.LEFT) ? Dir.RIGHT : Dir.LEFT));
+        }
+    }
 }
 
 function shot_try_move(dx, dy) {
@@ -199,6 +243,81 @@ function shot_move_cardinal() {
     return shot_try_move(_dx, _dy);
 }
 
+function shot_calculate_angle(target_x, target_y) {
+    angle_x_step = sign(target_x - x) * 2;
+    angle_y_step = sign(target_y - y) * 2;
+    angle_x_distance = abs(target_x - x);
+    angle_y_distance = abs(target_y - y);
+    angle_major_y = (angle_y_distance >= angle_x_distance);
+    angle_counter = 0;
+    angle_initialized = true;
+}
+
+function shot_move_angle_step() {
+    var _next_x = x;
+    var _next_y = y;
+    if (angle_major_y) {
+        _next_y += angle_y_step;
+        angle_counter += angle_x_distance;
+        if (angle_y_distance > 0 && angle_counter >= angle_y_distance) {
+            _next_x += angle_x_step;
+            angle_counter -= angle_y_distance;
+        }
+    } else {
+        _next_x += angle_x_step;
+        angle_counter += angle_y_distance;
+        if (angle_x_distance > 0 && angle_counter >= angle_x_distance) {
+            _next_y += angle_y_step;
+            angle_counter -= angle_x_distance;
+        }
+    }
+    return [_next_x, _next_y];
+}
+
+function shot_try_move_wraith(dx, dy) {
+    var _next_x = x + dx;
+    var _next_y = y + dy;
+    // Episodes 2 and 3 replaced check_move3 with check_movewb: the projectile
+    // only observes the inset screen bounds and passes through room terrain.
+    if (global.current_episode >= 2) {
+        if (_next_x < 16 || _next_x > 287 || _next_y < 1 || _next_y > 159)
+            return false;
+        x = _next_x;
+        y = _next_y;
+        return true;
+    }
+    return shot_try_move(dx, dy);
+}
+
+function shot_drop_reward(ordinary_type, apple_threshold) {
+    var _gx = (x + shot_w * 0.5) div TILE_W;
+    var _gy = (y + shot_h * 0.5) div TILE_H;
+    global.projectile_drop_counter++;
+    var _drop_type = ordinary_type;
+    if (global.projectile_drop_counter >= apple_threshold) {
+        _drop_type = 5;
+    }
+    var _can_drop = _gx >= 0 && _gx < GRID_COLS && _gy >= 0 && _gy < GRID_ROWS
+        && tile_get(_gx, _gy) >= TILE_FLY;
+    if (_can_drop) {
+        for (var _pickup_i = 0; _pickup_i < instance_number(obj_pickup); _pickup_i++) {
+            var _pickup = instance_find(obj_pickup, _pickup_i);
+            if (_pickup != noone && round(_pickup.x) == _gx * TILE_W
+            && round(_pickup.y) == _gy * TILE_H) {
+                _can_drop = false;
+                break;
+            }
+        }
+    }
+    if (!_can_drop) {
+        if (_drop_type == 5) global.projectile_drop_counter = apple_threshold - 1;
+        return false;
+    }
+    pickup_spawn(_drop_type, _gx * TILE_W, _gy * TILE_H);
+    if (_drop_type == 5) global.projectile_drop_counter = 0;
+    return true;
+}
+
 function shot_step_motion() {
     switch (shot_move) {
         case 0:
@@ -214,37 +333,118 @@ function shot_step_motion() {
         case 3:
             x -= 2;
             life_timer--;
-            return life_timer > 0 && x > -shot_w;
+            slow_counter--;
+            if (slow_counter <= 0) {
+                slow_counter = max(1, slow_period);
+                shot_speed++;
+                if (shot_speed > 6) shot_move = 0;
+            }
+            return life_timer > 0;
 
         case 4:
+            if (motion_delay > 0) {
+                motion_delay--;
+                return true;
+            }
             life_timer--;
-            if (life_timer <= 0) return false;
+            if (life_timer <= 0) {
+                shot_drop_reward(3, 4);
+                return false;
+            }
             if (global.player == noone || !instance_exists(global.player)) return false;
-            var _dx = clamp(global.player.x - x, -2, 2);
-            var _dy = clamp(global.player.y - y, -2, 2);
-            if (_dx != 0 && _dy != 0 && shot_try_move(_dx, _dy)) return true;
-            if (_dx != 0 && shot_try_move(_dx, 0)) return true;
-            if (_dy != 0 && shot_try_move(0, _dy)) return true;
+            var _dx = 0;
+            var _dy = 0;
+            if (x > global.player.x + 1) _dx = -2;
+            else if (x < global.player.x - 1) _dx = 2;
+            var _target_y = (shot_type == 1) ? global.player.y + 2 : global.player.y;
+            if (y < _target_y - 1) _dy = 2;
+            else if (y > _target_y + 1) _dy = -2;
+            if (_dx != 0 && _dy != 0 && shot_try_move_wraith(_dx, _dy)) {
+                facing = (_dx < 0) ? Dir.LEFT : Dir.RIGHT;
+                return true;
+            }
+            path_toggle = !path_toggle;
+            if (path_toggle) {
+                if (_dx != 0 && shot_try_move_wraith(_dx, 0)) {
+                    facing = (_dx < 0) ? Dir.LEFT : Dir.RIGHT;
+                    return true;
+                }
+                if (_dy != 0 && shot_try_move_wraith(0, _dy)) {
+                    facing = (_dy < 0) ? Dir.UP : Dir.DOWN;
+                    return true;
+                }
+            } else {
+                if (_dy != 0 && shot_try_move_wraith(0, _dy)) {
+                    facing = (_dy < 0) ? Dir.UP : Dir.DOWN;
+                    return true;
+                }
+                if (_dx != 0 && shot_try_move_wraith(_dx, 0)) {
+                    facing = (_dx < 0) ? Dir.LEFT : Dir.RIGHT;
+                    return true;
+                }
+            }
             return true;
 
         case 7:
+            if (drop_wait > 0) {
+                drop_wait--;
+                return true;
+            }
+            drop_decay_counter++;
+            if (drop_decay_counter > 2) {
+                drop_decay_counter = 0;
+                drop_interval = max(0, drop_interval - 1);
+            }
+            drop_wait = drop_interval;
             y += 2;
-            if (y > 124) {
+            var _drop_floor = (global.current_episode == 2) ? 160 : 124;
+            if (y > _drop_floor) {
+                x += 4 - irandom(8);
                 shot_move = 8;
-                velocity_x = (x < 150) ? 0.67 : -0.67;
-                velocity_y = -3.2;
+                bounce_y_velocity = 100;
+                bounce_y_counter = 0;
+                bounce_curve_counter = 50;
+                bounce_down = false;
+                bounce_x_counter = 3;
+                bounce_x_right = (x < 150);
             }
             return true;
 
         case 8:
-            x += velocity_x;
-            y += velocity_y;
-            velocity_y += 0.12;
-            if (y > 164) {
-                y = 164;
-                velocity_y = -abs(velocity_y) * 0.85;
+            bounce_x_counter--;
+            if (bounce_x_counter <= 0) {
+                bounce_x_counter = 3;
+                x += bounce_x_right ? 2 : -2;
             }
-            return x > -shot_w && x < SCREEN_W;
+            bounce_y_counter += bounce_y_velocity;
+            if (bounce_y_counter > 99) {
+                if (!bounce_down) {
+                    bounce_y_velocity -= 8;
+                    y -= 2;
+                } else {
+                    bounce_y_velocity += 8;
+                    y += 2;
+                }
+                bounce_y_counter -= 100;
+            }
+            if (bounce_y_velocity < 0) {
+                bounce_y_velocity = 0;
+                bounce_curve_counter = 1;
+            }
+            if (bounce_y_velocity > 100) {
+                bounce_y_velocity = 100;
+                bounce_curve_counter = 1;
+            }
+            bounce_curve_counter--;
+            if (bounce_curve_counter <= 0) {
+                bounce_curve_counter = 50;
+                if (bounce_down) bounce_y_velocity = 100;
+                bounce_down = !bounce_down;
+            }
+            if (y > 164) y = 164;
+            var _bounce_left = (global.current_episode == 2) ? 8 : 1;
+            var _bounce_right = ((global.current_episode == 2) ? 311 : 319) - shot_w;
+            return x >= _bounce_left && x <= _bounce_right;
 
         case 9:
             current_frame++;
@@ -255,46 +455,43 @@ function shot_step_motion() {
             return y <= 160;
 
         case 11:
-            var _dx = angle_target_x - x;
-            var _dy = angle_target_y - y;
-            var _length = max(1, point_distance(x, y, angle_target_x, angle_target_y));
-            velocity_x = 2 * _dx / _length;
-            velocity_y = 2 * _dy / _length;
-            return shot_try_move(velocity_x, velocity_y);
+            if (!angle_initialized)
+                shot_calculate_angle(global.player.x, global.player.y);
+            var _angle_step = shot_move_angle_step();
+            return shot_try_move(_angle_step[0] - x, _angle_step[1] - y);
 
         case 12: // Loki pod: aim at Thor, then ricochet after reaching an edge
-            if (velocity_x == 0 && velocity_y == 0) {
-                var _distance = max(1, point_distance(x, y, angle_target_x, angle_target_y));
-                velocity_x = 2 * (angle_target_x - x) / _distance;
-                velocity_y = 2 * (angle_target_y - y) / _distance;
-            }
-            x += velocity_x;
-            y += velocity_y;
-            if (x < 16 || x > 287 || y < 16 || y > 159) {
-                angle_target_x = irandom(SCREEN_W - 1);
-                angle_target_y = irandom(SCREEN_H - 1);
-                var _new_distance = max(1, point_distance(x, y, angle_target_x, angle_target_y));
-                velocity_x = 2 * (angle_target_x - x) / _new_distance;
-                velocity_y = 2 * (angle_target_y - y) / _new_distance;
+            if (!angle_initialized)
+                shot_calculate_angle(global.player.x, global.player.y);
+            var _pod_step = shot_move_angle_step();
+            if (_pod_step[0] < 16 || _pod_step[0] > 287
+            || _pod_step[1] < 16 || _pod_step[1] > 159) {
+                shot_calculate_angle(irandom(318), irandom(190));
                 shot_move = 13;
                 life_timer = 240;
                 current_frame = min(2, array_length(shot_sequence) - 1);
+            } else {
+                x = _pod_step[0];
+                y = _pod_step[1];
             }
             return true;
 
         case 13: // Loki pod ricochet phase
             life_timer--;
-            x += velocity_x;
-            y += velocity_y;
-            if (x < 16 || x > 287) {
-                x = clamp(x, 16, 287);
-                velocity_x = -velocity_x;
+            if (life_timer <= 0) {
+                shot_drop_reward(4, 5);
+                return false;
             }
-            if (y < 16 || y > 159) {
-                y = clamp(y, 16, 159);
-                velocity_y = -velocity_y;
-    }
-            return life_timer > 0;
+            var _ricochet_step = shot_move_angle_step();
+            if (_ricochet_step[0] < 16 || _ricochet_step[0] > 287)
+                angle_x_step = -angle_x_step;
+            else if (_ricochet_step[1] < 16 || _ricochet_step[1] > 159)
+                angle_y_step = -angle_y_step;
+            else {
+                x = _ricochet_step[0];
+                y = _ricochet_step[1];
+            }
+            return true;
     }
     return false;
 }
@@ -333,6 +530,26 @@ function enemy_spawn_embedded_shot(shooter, source_actor_type) {
         y = shooter.y + (shooter.col_h - shot_h) * 0.5;
         angle_target_x = global.player.x;
         angle_target_y = global.player.y;
+        motion_delay = 0;
+        slow_counter = 0;
+        slow_period = 0;
+        drop_wait = 0;
+        drop_interval = 0;
+        drop_decay_counter = 0;
+        bounce_y_velocity = 0;
+        bounce_y_counter = 0;
+        bounce_curve_counter = 0;
+        bounce_down = false;
+        bounce_x_counter = 0;
+        bounce_x_right = false;
+        angle_x_step = 0;
+        angle_y_step = 0;
+        angle_x_distance = 0;
+        angle_y_distance = 0;
+        angle_major_y = false;
+        angle_counter = 0;
+        angle_initialized = false;
+        path_toggle = false;
         velocity_x = 0;
         velocity_y = 0;
         life_timer = 240;

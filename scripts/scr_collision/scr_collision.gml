@@ -50,7 +50,7 @@ function actor_player_collision(actor_inst, dx, dy) {
                     global.magic++;
                     audio_play_sound(snd_got_angel, 1, false);
                 }
-                actor_inst.special_cooldown = 6;
+                actor_inst.special_cooldown = 1;
             }
             return false;
 
@@ -63,7 +63,22 @@ function actor_player_collision(actor_inst, dx, dy) {
             return false;
 
         case 5: // boulder: contact starts it rolling
-            actor_inst.facing = global.player.facing;
+            var _roll_dir = global.player.facing;
+            if (_diagonal) {
+                var _thor_x1 = global.player.x + 1;
+                var _thor_x2 = global.player.x + 12;
+                if (global.player.input_vertical_dir == Dir.UP
+                && global.player.input_horizontal_dir == Dir.LEFT) {
+                    _roll_dir = (_thor_x1 < actor_inst.x + 15) ? Dir.UP : Dir.LEFT;
+                } else if (global.player.input_vertical_dir == Dir.UP) {
+                    _roll_dir = (_thor_x2 < actor_inst.x) ? Dir.RIGHT : Dir.UP;
+                } else if (global.player.input_horizontal_dir == Dir.RIGHT) {
+                    _roll_dir = (_thor_x2 > actor_inst.x) ? Dir.DOWN : Dir.RIGHT;
+                } else {
+                    _roll_dir = (_thor_x1 > actor_inst.x + 15) ? Dir.LEFT : Dir.DOWN;
+                }
+            }
+            actor_inst.facing = _roll_dir;
             actor_inst.move_pattern = 14;
             return false;
 

@@ -1,5 +1,6 @@
 /// @description Enemy update
 if (global.menu.active) exit;
+if (global.death_active) exit;
 if (dialogue_cooldown > 0) dialogue_cooldown--;
 if (special_cooldown > 0) special_cooldown--;
 if (dialogue_contact_latched
@@ -10,14 +11,15 @@ if (global.dialogue.active || is_dead || !visible) exit;
 
 if (is_magic_effect) {
     movement_execute(id);
-    magic_tornado_damage(id);
+    if (is_tornado) magic_tornado_damage(id);
 } else {
 enemy_fire_pattern(id);
 movement_execute(id);
 }
 
 // Original next_frame only advances animation when a movement tick occurs.
-if (movement_tick && move_pattern != 15 && move_pattern != 22) {
+if (movement_tick && move_pattern != 6 && move_pattern != 15
+&& move_pattern != 22 && move_pattern != 28) {
     frame_count++;
     if (frame_count >= frame_speed) {
         frame_count = 0;

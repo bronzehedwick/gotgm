@@ -4,13 +4,13 @@ function draw_actor_sprite(actor_type_id, dir, frame, ax, ay) {
     draw_self();
 }
 
-function draw_pickup(pickup_type, px, py) {
+function draw_pickup(pickup_type, px, py, frame = 0) {
     if (pickup_type <= 0 || pickup_type > 32) return;
 
     var _idx = pickup_type - 1;
     var _sx = (_idx mod 8) * TILE_W;
     var _sy = (_idx div 8) * TILE_H;
-    draw_sprite_part(spr_objects, 0, _sx, _sy, TILE_W, TILE_H, px, py);
+    draw_sprite_part(spr_objects, frame, _sx, _sy, TILE_W, TILE_H, px, py);
 }
 
 /// @function draw_original_text_colour(text, x, y, colour, shadow)

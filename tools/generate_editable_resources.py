@@ -295,25 +295,51 @@ def palette_variant(base: list[tuple[int, int, int, int]], overrides: tuple[int,
     return result
 
 
+def animated_game_palette(
+    base: list[tuple[int, int, int, int]], phase: int
+) -> list[tuple[int, int, int, int]]:
+    """Reproduce xshowpage's four-step VGA palette rotation.
+
+    The DOS renderer does not move the jewel/potion pixels or brighten the
+    water tiles. It rotates one bright blue entry through 240..243 and one
+    bright red entry through 244..247 (G_ASM.ASM, PAL_SPEED/palset tables).
+    Baking those palette states as RGBA sprite frames preserves that behavior
+    on modern renderers which no longer expose a global 8-bit VGA palette.
+    """
+    result = list(base)
+    for index in range(240, 244):
+        result[index] = (0, 0, 0x3B * 4, 255)
+    for index in range(244, 248):
+        result[index] = (0x3B * 4, 0, 0, 255)
+    result[240 + (phase % 4)] = (0x27 * 4, 0x27 * 4, 0x3F * 4, 255)
+    result[244 + (phase % 4)] = (0x3F * 4, 0x27 * 4, 0x27 * 4, 255)
+    return result
+
+
 def create_tileset(archive: GotArchive, base_palette: list[tuple[int, int, int, int]],
                    episode: int, overrides: tuple[int, int, int]) -> tuple[str, str]:
     suffix = "_".join(str(value) for value in overrides)
     sprite_name = f"spr_tiles_ep{episode}_{suffix}"
     tileset_name = f"ts_ep{episode}_{suffix}"
-    palette = palette_variant(base_palette, overrides)
     data = archive.read(f"BPICS{episode}")
 
     # Tile zero is reserved as empty by GameMaker.  Original tile N therefore
     # occupies GameMaker tile N+1.  The 16x15 atlas has room for all 230 tiles.
-    atlas = Image.new("RGBA", (256, 240))
-    for index in range(len(data) // PIC_BLOCK_SIZE):
-        tile = decode_pic_block(data[index * PIC_BLOCK_SIZE:(index + 1) * PIC_BLOCK_SIZE], palette)
-        slot = index + 1
-        atlas.alpha_composite(tile, ((slot % 16) * 16, (slot // 16) * 16))
+    atlases: list[Image.Image] = []
+    for phase in range(4):
+        palette = palette_variant(animated_game_palette(base_palette, phase), overrides)
+        atlas = Image.new("RGBA", (256, 240))
+        for index in range(len(data) // PIC_BLOCK_SIZE):
+            tile = decode_pic_block(
+                data[index * PIC_BLOCK_SIZE:(index + 1) * PIC_BLOCK_SIZE], palette
+            )
+            slot = index + 1
+            atlas.alpha_composite(tile, ((slot % 16) * 16, (slot // 16) * 16))
+        atlases.append(atlas)
 
     frame_image_resource(
         sprite_name,
-        [atlas],
+        atlases,
         folder_ref("Original Tiles", "folders/Sprites/Original Tiles.yy"),
         playback_speed=0.0,
     )
@@ -577,25 +603,29 @@ def create_story_resources(archive: GotArchive) -> list[str]:
 
 
 def create_actor_resources(archive: GotArchive,
-                           palette: list[tuple[int, int, int, int]]) -> tuple[dict[int, str], list[str]]:
+                           palette: list[tuple[int, int, int, int]],
+                           actor_numbers: set[int] | None = None) -> tuple[dict[int, str], list[str]]:
     object_names: dict[int, str] = {}
     resources: list[str] = []
     actor_folder = PROJECT_DIR / "datafiles" / "data" / "actors"
     for path in sorted(actor_folder.glob("actor*.json"), key=lambda item: int(item.stem[5:])):
         definition = json.loads(path.read_text(encoding="utf-8"))
         number = int(definition["actor_number"])
+        if actor_numbers is not None and number not in actor_numbers:
+            continue
         info = definition["actor_info"]
         label = slug(info.get("name", ""))
         sprite_name = f"spr_actor_{number:03d}_{label}"
         object_name = f"obj_actor_{number:03d}_{label}"
         raw = archive.read(f"ACTOR{number}")
+        # ACTOR.pic is [4 directions][4 frames]. Keep the fixed direction
+        # stride while omitting trailing slots the runtime can never address.
         sequence = info.get("frame_sequence", [0])
-        frame_count = max(
-            1,
-            int(info.get("directions", 0)) * int(info.get("frames", 0)),
-            max(sequence, default=0) + 1,
+        frame_count = min(
+            16,
+            max(1, (int(info.get("directions", 1)) - 1) * 4
+                + max(sequence, default=0) + 1),
         )
-        frame_count = min(16, frame_count)
         frames = [
             indexed_image(16, 16, raw[index * 256:(index + 1) * 256], palette)
             for index in range(frame_count)
@@ -606,6 +636,13 @@ def create_actor_resources(archive: GotArchive,
             folder_ref("Original Actors", "folders/Sprites/Original Actors.yy"),
             playback_speed=0.0,
         )
+
+        # Focused repair runs update only the requested actor sprites. The full
+        # project generation below still creates their shot and child objects.
+        if actor_numbers is not None:
+            object_names[number] = object_name
+            resources.append(sprite_name)
+            continue
 
         shot_info = definition["shot_info"]
         shot_sprite_name = f"spr_shot_{number:03d}"
@@ -652,10 +689,14 @@ def create_pickup_resources(archive: GotArchive,
     for number in range(1, len(data) // PIC_BLOCK_SIZE + 1):
         sprite_name = f"spr_pickup_{number:02d}"
         object_name = f"obj_pickup_{number:02d}"
-        image = decode_pic_block(data[(number - 1) * PIC_BLOCK_SIZE:number * PIC_BLOCK_SIZE], palette)
+        block = data[(number - 1) * PIC_BLOCK_SIZE:number * PIC_BLOCK_SIZE]
+        images = [
+            decode_pic_block(block, animated_game_palette(palette, phase))
+            for phase in range(4)
+        ]
         frame_image_resource(
             sprite_name,
-            [image],
+            images,
             folder_ref("Original Pickups", "folders/Sprites/Original Pickups.yy"),
             playback_speed=0.0,
         )

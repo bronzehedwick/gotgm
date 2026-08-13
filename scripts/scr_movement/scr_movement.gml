@@ -61,6 +61,25 @@ function move_animate_only() {
 
 function move_try(dx, dy) {
     if (!check_move_enemy(x, y, col_w, col_h, dx, dy, is_flying)) return false;
+
+    // check_move2() in 1_MOVPAT.C tests the proposed enemy rectangle against
+    // every other active actor. That includes push blocks and FAKEBUSH actors;
+    // their solidity value is deliberately irrelevant for enemy movement.
+    var _nx1 = x + dx + 1;
+    var _ny1 = y + dy + 1;
+    var _nx2 = x + dx + col_w - 1;
+    var _ny2 = y + dy + col_h - 1;
+    for (var _i = 0; _i < instance_number(obj_enemy); _i++) {
+        var _other = instance_find(obj_enemy, _i);
+        if (_other == noone || _other.id == id || !_other.visible
+        || _other.is_dead || _other.is_magic_effect) continue;
+        var _ox1 = _other.x;
+        var _oy1 = _other.y;
+        var _ox2 = _other.x + _other.col_w;
+        var _oy2 = _other.y + _other.col_h;
+        if (_nx1 <= _ox2 && _nx2 >= _ox1
+        && _ny1 <= _oy2 && _ny2 >= _oy1) return false;
+    }
     x += dx;
     y += dy;
     return true;
@@ -172,7 +191,7 @@ function move_vertical_random() {
         facing = irandom(1);
         return;
     }
-    move_counter--;
+    if (pass_value != 1) move_counter--;
     var _dy = (facing == Dir.UP) ? -2 : 2;
     if (!move_try(0, _dy)) move_counter = 0;
 }
@@ -473,9 +492,13 @@ function move_timed_dart() {
 }
 
 function move_effect() {
-    current_frame = (current_frame + 1) mod min(3, array_length(frame_sequence));
+    current_frame = (current_frame + 1) mod array_length(frame_sequence);
     effect_timer--;
     if (effect_timer <= 0) {
+        if (death_source_def != undefined) {
+            combat_drop_loot_definition(death_source_def, x, y, death_source_w, death_source_h);
+            death_source_def = undefined;
+        }
         is_dead = true;
         instance_destroy();
     } else if (is_boss_explosion && current_frame == 0) {

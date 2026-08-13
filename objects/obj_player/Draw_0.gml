@@ -1,6 +1,6 @@
 /// @description Draw player
 // Flash when invulnerable
-if (invulnerable_timer > 0 && (invulnerable_timer mod 4) < 2) {
+if (!global.death_active && invulnerable_timer > 0 && (invulnerable_timer mod 4) < 2) {
     // Skip drawing for flash effect
     return;
 }

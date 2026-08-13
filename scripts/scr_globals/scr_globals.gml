@@ -51,6 +51,7 @@ function game_init() {
     global.quest_object = 0;
     global.flags = {};
     global.tile_overrides = {};
+    global.kill_good_guy_informed = false;
     global.demo_active = false;
     global.demo_data = -1;
     global.demo_index = 0;
@@ -98,6 +99,7 @@ function game_init() {
         episode: 1, level: 23, x: 128, y: 95, facing: Dir.DOWN,
         health: 150, magic: 0, jewels: 0, keys: 0, score: 0,
         selected_item: 0, quest_object: 0, inventory_json: "{}",
+        flags_json: "{}", collected_pickups_json: "{}", tile_overrides_json: "{}",
         armor_level: 0, hammer_damage: 10,
     };
 

@@ -35,7 +35,7 @@ function actor_configure(inst, actor_type, value, dir, invisible, source_slot = 
         invisibility_group = real(invisible);
         dialogue_cooldown = 0;
         special_cooldown = 0;
-        shot_type = _def.shot_type;
+        shot_type = (_def.shots_allowed > 0 && actor_type < 100) ? actor_type : -1;
         shot_pattern = _def.shot_pattern;
         shots_allowed = _def.shots_allowed;
         shot_cooldown = irandom_range(1, 20);
@@ -78,8 +78,14 @@ function actor_configure(inst, actor_type, value, dir, invisible, source_slot = 
         dart_return_dir = facing;
         dart_state = 0;
         effect_timer = max(1, _def.frames * _def.frame_speed);
+        death_source_def = undefined;
+        death_source_w = 0;
+        death_source_h = 0;
         visible = (real(invisible) <= 0);
-        image_index = (directions > 1) ? facing * anim_frames : 0;
+        if (actor_type == 106) sprite_index = spr_actor_106_sparkle;
+        else if (actor_type == 107) sprite_index = spr_actor_107_explode;
+        else if (actor_type == 108) sprite_index = spr_actor_108_tornado;
+        image_index = (directions > 1) ? facing * 4 : 0;
         image_speed = 0;
     }
     return inst;
@@ -110,6 +116,10 @@ function pickup_spawn(obj_type, px, py) {
     with (_inst) {
         pickup_type = obj_type;
         persistent_pickup = false;
+        var _number = string(obj_type);
+        _number = string_repeat("0", max(0, 2 - string_length(_number))) + _number;
+        sprite_index = asset_get_index("spr_pickup_" + _number);
+        image_speed = 0;
     }
     return _inst;
 }

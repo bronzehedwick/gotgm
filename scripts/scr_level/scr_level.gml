@@ -112,9 +112,12 @@ function level_draw_tiles() {
     // Original GOT first fills every cell with the room background tile, then
     // draws its foreground icon with palette index zero transparent.
     var _background = global.current_level_metadata.bg_color + 1;
+    // G_ASM.ASM advances the four palette states every PAL_SPEED ticks.
+    // The generated atlas frames bake those VGA palette states exactly.
+    var _palette_frame = floor(current_time / 200) mod 4;
     for (var _bg_row = 0; _bg_row < GRID_ROWS; _bg_row++) {
         for (var _bg_column = 0; _bg_column < GRID_COLS; _bg_column++) {
-            draw_sprite_part(global.room_tiles_sprite, 0,
+            draw_sprite_part(global.room_tiles_sprite, _palette_frame,
                 (_background mod 16) * TILE_W, (_background div 16) * TILE_H,
                 TILE_W, TILE_H, _bg_column * TILE_W, _bg_row * TILE_H);
         }
@@ -125,7 +128,7 @@ function level_draw_tiles() {
             var _tile = global.tile_grid[_row][_column];
             if (_tile >= 0) {
                 var _source_tile = _tile + 1;
-                draw_sprite_part(global.room_tiles_sprite, 0,
+                draw_sprite_part(global.room_tiles_sprite, _palette_frame,
                     (_source_tile mod 16) * TILE_W, (_source_tile div 16) * TILE_H,
                     TILE_W, TILE_H, _column * TILE_W, _row * TILE_H);
             }
@@ -216,6 +219,16 @@ function level_set_tile(grid_x, grid_y, original_tile) {
     }
 }
 
+/// @description Change a tile and retain the changed screen exactly as the
+/// original in-memory LEVEL array did when erase_door() edited scrn.icon.
+function level_set_persistent_tile(grid_x, grid_y, original_tile) {
+    var _position = grid_y * GRID_COLS + grid_x;
+    var _key = string(global.current_episode) + ":"
+        + string(global.current_level) + ":" + string(_position);
+    global.tile_overrides[$ _key] = original_tile;
+    level_set_tile(grid_x, grid_y, original_tile);
+}
+
 /// @function special_tile_player(grid_x, grid_y, tile_id, proposed_x, proposed_y)
 /// @description Episode-aware behavior for original tile IDs above 200
 function special_tile_player(grid_x, grid_y, tile_id, proposed_x, proposed_y) {
@@ -230,7 +243,9 @@ function special_tile_player(grid_x, grid_y, tile_id, proposed_x, proposed_y) {
         case 201:
             if (global.keys > 0) {
                 global.keys--;
-                level_set_tile(grid_x, grid_y, global.current_level_metadata.bg_color);
+                level_set_persistent_tile(
+                    grid_x, grid_y, global.current_level_metadata.bg_color
+                );
                 audio_play_sound(snd_got_door, 3, false);
                 return true;
             }
@@ -244,7 +259,9 @@ function special_tile_player(grid_x, grid_y, tile_id, proposed_x, proposed_y) {
         case 209:
             if (global.jewels >= 10) {
                 global.jewels -= 10;
-                level_set_tile(grid_x, grid_y, global.current_level_metadata.bg_color);
+                level_set_persistent_tile(
+                    grid_x, grid_y, global.current_level_metadata.bg_color
+                );
                 audio_play_sound(snd_got_door, 3, false);
                 return true;
             }
@@ -253,7 +270,9 @@ function special_tile_player(grid_x, grid_y, tile_id, proposed_x, proposed_y) {
         case 210:
             if (global.jewels >= 100) {
                 global.jewels -= 100;
-                level_set_tile(grid_x, grid_y, global.current_level_metadata.bg_color);
+                level_set_persistent_tile(
+                    grid_x, grid_y, global.current_level_metadata.bg_color
+                );
                 audio_play_sound(snd_got_door, 3, false);
                 return true;
             }

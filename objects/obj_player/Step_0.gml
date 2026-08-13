@@ -138,7 +138,11 @@ if (_input.fire && hammer_cooldown <= 0) {
 if (invulnerable_timer <= 0) {
     var _enemy = instance_place(x, y, obj_enemy);
     if (_enemy != noone && _enemy.visible && !_enemy.is_magic_effect) {
-        if (!actor_trigger_special(_enemy, false)) {
+        var _contact_function = (_enemy.actor_def == undefined)
+            ? 0 : _enemy.actor_def.func_num;
+        var _contact_hurts = (_contact_function == 0
+            || _contact_function == 6 || _contact_function == 255);
+        if (!actor_trigger_special(_enemy, false) && _contact_hurts) {
             combat_player_hit(_enemy.strength);
             if (_enemy.move_pattern == 18) _enemy.hit_player = true;
         }

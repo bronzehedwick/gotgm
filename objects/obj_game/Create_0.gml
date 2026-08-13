@@ -3,5 +3,5 @@ game_init();
 
 depth = 300;
 level_enter_current_room();
-menu_show_title();
+menu_show_opening();
 show_debug_message("Game initialized in " + room_get_name(room));

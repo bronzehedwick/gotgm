@@ -20,7 +20,9 @@ draw_sprite(spr_status_bar, 0, 0, _panel_y);
 if (global.selected_item >= 1 && global.selected_item <= 6) {
     var _pickup_number = global.selected_item + 26;
     var _item_sprite = asset_get_index("spr_pickup_" + string(_pickup_number));
-    if (_item_sprite != -1) draw_sprite(_item_sprite, 0, 280, _panel_y + 4);
+    if (_item_sprite != -1)
+        // PANEL.C display_item(): xfput(282, 8, ... objects[item + 25]).
+        draw_sprite(_item_sprite, floor(current_time / 200) mod 4, 282, _panel_y + 8);
 }
 
 // Original PANEL.C bar coordinates and palette colours.

@@ -3,7 +3,8 @@ function dialogue_init(){
  global.dialogue={active:false,episode:1,entry:"",lines:[],labels:{},pc:0,pending:[],
  vars:array_create(26,0),strings:array_create(26,""),calls:[],loops:[],mode:"idle",
  text_lines:[],page:0,choices:[],selection:0,answer_var:0,title:"",portrait:-1,
- item_sprite:-1,speaker:noone,pause_timer:0,last_if:false};
+ item_sprite:-1,speaker:noone,pause_timer:0,last_if:false,
+ reveal_count:0,reveal_timer:0};
  global.dialogue_banks=array_create(4,undefined);
 }
 function dialogue_bank(ep){
@@ -220,10 +221,14 @@ function dialogue_execute(s){
   var _tail=string_copy(s,_then+6,string_length(s)-_then-5),_else=string_pos(" ELSE ",string_upper(_tail));
   var _yes=dialogue_compare(_condition);_d.last_if=_yes;
   if(_yes){if(_else>0)_tail=string_copy(_tail,1,_else-1);dialogue_enqueue_front(_tail);}
-  else if(_else>0)dialogue_enqueue_front(string_copy(_tail,_else+6,string_length(_tail)-_else-5));return;
+  else if(_else>0)dialogue_enqueue_front(string_copy(_tail,_else+6,string_length(_tail)-_else-5));
+  // A successful IF must return after queuing its THEN clause. Falling into
+  // ELSE discarded the queued purchase command, so shop selections did nothing.
+  return;
  case"ELSE":if(!_d.last_if)dialogue_enqueue_front(_args);return;
  case"SAY":case"TEXT":case"ITEMSAY":
-  _d.text_lines=dialogue_collect_quoted();_d.page=0;_d.item_sprite=-1;if(_name=="TEXT")_d.portrait=-1;
+  _d.text_lines=dialogue_collect_quoted();_d.page=0;_d.reveal_count=0;_d.reveal_timer=0;
+  _d.item_sprite=-1;if(_name=="TEXT")_d.portrait=-1;
   if(_name=="ITEMSAY"){var _num=string(dialogue_eval_numeric(_args));_num=string_repeat("0",max(0,2-string_length(_num)))+_num;
    _d.item_sprite=asset_get_index("spr_pickup_"+_num);}_d.mode="say";return;
  case"ASK":
@@ -267,7 +272,32 @@ function dialogue_run(){
 function dialogue_update(){
  var _d=global.dialogue;if(!_d.active)return;if(keyboard_check_pressed(vk_escape)){dialogue_close();return;}var _ok=keyboard_check_pressed(vk_space)||keyboard_check_pressed(vk_enter)||keyboard_check_pressed(ord("Z"));
  if(_d.mode=="pause"){_d.pause_timer--;if(_d.pause_timer<=0){_d.mode="running";dialogue_run();}return;}
- if(_d.mode=="say"){if(_ok){if((_d.page+1)*5<array_length(_d.text_lines))_d.page++;else{_d.mode="running";_d.item_sprite=-1;dialogue_run();}}return;}
+ if(_d.mode=="say"){
+  var _page_chars=dialogue_page_visible_length(_d.page);
+  if(_d.reveal_count<_page_chars){
+   if(_ok)_d.reveal_count=_page_chars;
+   else{
+    _d.reveal_timer++;
+    // timer_cnt<5 in 1_BACK.C runs at 120 Hz: alternate 2/3 GameMaker
+    // frames for the same 24 characters per second.
+    var _reveal_wait=2+(_d.reveal_count mod 2);
+    if(_d.reveal_timer>=_reveal_wait){
+     _d.reveal_timer=0;_d.reveal_count++;
+     // The DOS mixer reuses the WOOP channel. Stop the preceding character
+     // sound before restarting it so rapid text never stacks many copies.
+     if(audio_is_playing(snd_got_woop))audio_stop_sound(snd_got_woop);
+     audio_play_sound(snd_got_woop,1,false);
+    }
+   }
+   return;
+  }
+  if(_ok){
+   if((_d.page+1)*5<array_length(_d.text_lines)){
+    _d.page++;_d.reveal_count=0;_d.reveal_timer=0;
+   }else{_d.mode="running";_d.item_sprite=-1;dialogue_run();}
+  }
+  return;
+ }
  if(_d.mode=="ask"){if(keyboard_check_pressed(vk_up))_d.selection=max(0,_d.selection-1);
   if(keyboard_check_pressed(vk_down))_d.selection=min(array_length(_d.choices)-1,_d.selection+1);
   if(_ok&&array_length(_d.choices)>0){_d.vars[_d.answer_var]=_d.selection+1;_d.mode="running";dialogue_run();}return;}dialogue_run();
@@ -295,10 +325,44 @@ function dialogue_draw_line(s,xx,yy){
   draw_original_text_colour(_c,_x,yy,_colour,true);_x+=8;
  }
 }
+function dialogue_visible_length(s){
+ var _length=0;
+ for(var _i=1;_i<=string_length(s);_i++){
+  if(string_char_at(s,_i)=="~"&&_i<string_length(s)){
+   var _code=string_upper(string_char_at(s,_i+1));
+   if((ord(_code)>=ord("0")&&ord(_code)<=ord("9"))
+   ||(ord(_code)>=ord("A")&&ord(_code)<=ord("F"))){_i++;continue;}
+  }
+  _length++;
+ }
+ return _length;
+}
+function dialogue_page_visible_length(page){
+ var _d=global.dialogue,_total=0,_first=page*5;
+ for(var _i=0;_i<5;_i++){
+  var _at=_first+_i;
+  if(_at>=array_length(_d.text_lines))break;
+  _total+=dialogue_visible_length(_d.text_lines[_at]);
+ }
+ return _total;
+}
+function dialogue_draw_line_limit(s,xx,yy,limit){
+ var _x=xx,_colour=dialogue_markup_colour(0),_drawn=0;
+ for(var _i=1;_i<=string_length(s)&&_drawn<limit;_i++){
+  var _c=string_char_at(s,_i);
+  if(_c=="~"&&_i<string_length(s)){
+   var _code=string_upper(string_char_at(s,_i+1)),_value=-1;
+   if(ord(_code)>=ord("0")&&ord(_code)<=ord("9"))_value=ord(_code)-ord("0");
+   else if(ord(_code)>=ord("A")&&ord(_code)<=ord("F"))_value=ord(_code)-ord("A")+10;
+   if(_value>=0){_colour=dialogue_markup_colour(_value);_i++;continue;}
+  }
+  draw_original_text_colour(_c,_x,yy,_colour,true);_x+=8;_drawn++;
+ }
+}
 function dialogue_draw_tile(tile_id,xx,yy){
  if(global.room_tiles_sprite==-1)return;
  var _source=tile_id+1;
- draw_sprite_part(global.room_tiles_sprite,0,(_source mod 16)*16,(_source div 16)*16,16,16,xx,yy);
+ draw_sprite_part(global.room_tiles_sprite,floor(current_time/200) mod 4,(_source mod 16)*16,(_source div 16)*16,16,16,xx,yy);
 }
 function dialogue_draw_frame(){
  draw_set_colour(make_colour_rgb(131,83,47));
@@ -326,11 +390,14 @@ function dialogue_draw(){
   return;
  }
  if(_d.portrait!=-1)draw_sprite_ext(_d.portrait,floor(current_time/140)mod 4,152,65,1,1,0,c_white,1);
- if(_d.item_sprite!=-1)draw_sprite_ext(_d.item_sprite,0,176,65,1,1,0,c_white,1);
+ if(_d.item_sprite!=-1)draw_sprite(_d.item_sprite,floor(current_time/200) mod 4,176,65);
  var _first=_d.page*5;
+ var _remaining=_d.reveal_count;
  for(var _i=0;_i<5;_i++){
   var _at=_first+_i;if(_at>=array_length(_d.text_lines))break;
-  dialogue_draw_line(_d.text_lines[_at],52,83+_i*10);
+  dialogue_draw_line_limit(_d.text_lines[_at],52,83+_i*10,max(0,_remaining));
+  _remaining-=dialogue_visible_length(_d.text_lines[_at]);
  }
- if(_first+5<array_length(_d.text_lines))dialogue_draw_line("~4More...",216,134);
+ if(_d.reveal_count>=dialogue_page_visible_length(_d.page)
+ &&_first+5<array_length(_d.text_lines))dialogue_draw_line("~4More...",216,134);
 }

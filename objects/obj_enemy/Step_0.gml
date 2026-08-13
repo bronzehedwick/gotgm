@@ -28,7 +28,7 @@ if (movement_tick && move_pattern != 6 && move_pattern != 15
 }
 
 var _pose = frame_sequence[clamp(current_frame, 0, array_length(frame_sequence) - 1)];
-image_index = _pose + ((directions > 1) ? facing * anim_frames : 0);
+image_index = _pose + ((directions > 1) ? facing * 4 : 0);
 
 if (vulnerable_timer > 0) vulnerable_timer--;
 image_speed = 0;

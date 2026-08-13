@@ -14,6 +14,10 @@ function menu_init() {
         story_phase: 0,
         story_scroll: 0,
         story_delay: 0,
+        pending_room: -1,
+        opening_timer: 0,
+        game_title_timer: 0,
+        game_title_music_started: false,
         page_lines: [],
     };
 }
@@ -42,7 +46,23 @@ function menu_show_title() {
     menu_set("title", "God of Thunder Menu", [
         "Play Game", "High Scores", "Credits", "Demo", "BBS Info", "Quit"
     ], "title");
-    music_play_opening();
+    music_play_asset(mus_got_opening);
+}
+
+function menu_show_opening() {
+    menu_set("opening", "", [], "title");
+    global.menu.opening_timer = 0;
+    if (global.music_instance != -1) audio_stop_sound(global.music_instance);
+    global.music_instance = -1;
+    global.music_current_asset = -1;
+}
+
+function menu_show_game_title() {
+    menu_set("game_title", "", [], "title");
+    global.menu.game_title_timer = 0;
+    global.menu.game_title_music_started = false;
+    if (audio_is_playing(snd_got_thunder)) audio_stop_sound(snd_got_thunder);
+    audio_play_sound(snd_got_thunder, 4, false);
 }
 
 function menu_show_player() {
@@ -215,6 +235,7 @@ function menu_begin_game(episode, demo_playback = false) {
     global.hammer_damage = _hammer_damage;
     global.flags = {};
     global.tile_overrides = {};
+    global.kill_good_guy_informed = false;
     global.post_boss_stage = 0;
     global.post_boss_episode = 0;
     global.endgame_active = false;
@@ -240,6 +261,7 @@ function menu_begin_game(episode, demo_playback = false) {
         health: _health, magic: _magic, jewels: _jewels, keys: 0, score: _score,
         selected_item: _selected_item, quest_object: 0,
         inventory_json: json_stringify(_inventory),
+        flags_json: "{}", collected_pickups_json: "{}", tile_overrides_json: "{}",
         armor_level: _armor_level, hammer_damage: _hammer_damage,
     };
 
@@ -255,6 +277,7 @@ function menu_begin_game(episode, demo_playback = false) {
     if (demo_playback) {
         global.menu.active = false;
         global.menu.mode = "none";
+        global.menu.pending_room = -1;
     } else {
         global.menu.active = true;
         global.menu.mode = "story";
@@ -271,7 +294,13 @@ function menu_begin_game(episode, demo_playback = false) {
     }
 
     var _start = level_room_asset(episode, _level);
-    if (_start != -1) room_goto(_start);
+    if (demo_playback) {
+        if (_start != -1) room_goto(_start);
+    } else {
+        // The DOS episode shows its story before SHOW_LEVEL. Keep the live
+        // gameplay room out of the transition so actors never appear frozen.
+        global.menu.pending_room = _start;
+    }
 }
 
 function menu_new_game(episode = 1) {
@@ -283,9 +312,12 @@ function menu_start_demo() {
 }
 
 function menu_finish_story() {
+    var _start = global.menu.pending_room;
+    global.menu.pending_room = -1;
     global.menu.active = false;
     global.menu.mode = "none";
-    music_enter_room();
+    if (_start != -1) room_goto(_start);
+    else music_enter_room();
 }
 
 function menu_back() {
@@ -427,6 +459,26 @@ function menu_update() {
     if (_m.status_timer > 0) _m.status_timer--;
     else _m.status = "";
 
+    if (_m.mode == "opening") {
+        _m.opening_timer++;
+        if (_m.opening_timer >= 180 || keyboard_check_pressed(vk_anykey))
+            menu_show_game_title();
+        return;
+    }
+
+    if (_m.mode == "game_title") {
+        _m.game_title_timer++;
+        if (!_m.game_title_music_started && _m.game_title_timer >= 72) {
+            _m.game_title_music_started = true;
+            music_play_asset(mus_got_opening);
+        }
+        // The preserved launcher holds the title painting for roughly ten
+        // seconds. As in the DOS front end, any response advances immediately.
+        if (_m.game_title_timer >= 600 || keyboard_check_pressed(vk_anykey))
+            menu_show_title();
+        return;
+    }
+
     if (_m.mode == "story") {
         if (keyboard_check_pressed(vk_escape)) {
             menu_finish_story();
@@ -564,6 +616,34 @@ function menu_draw() {
         var _story = asset_get_index("spr_story_ep" + string(global.current_episode));
         if (_story != -1)
             draw_sprite_part(_story, 0, 0, floor(_m.story_scroll), 320, 240, 0, 0);
+        return;
+    }
+
+    if (_m.mode == "opening") {
+        draw_clear(c_black);
+        var _timer = _m.opening_timer;
+        var _shake = 0;
+        if (_timer < 72) {
+            var _shake_frames = [0, -3, 2, -2, 3, -1, 1, 0];
+            _shake = _shake_frames[_timer mod array_length(_shake_frames)];
+        }
+        var _alpha = min(1, _timer / 12);
+        if (_timer > 162) _alpha = min(_alpha, (180 - _timer) / 18);
+        draw_sprite_ext(spr_title_card, 0, _shake, 0, 1, 1, 0, c_white, _alpha);
+        return;
+    }
+
+    if (_m.mode == "game_title") {
+        draw_clear(c_black);
+        var _title_timer = _m.game_title_timer;
+        var _title_shake = 0;
+        if (_title_timer < 72) {
+            var _title_shake_frames = [0, -3, 2, -2, 3, -1, 1, 0];
+            _title_shake = _title_shake_frames[
+                _title_timer mod array_length(_title_shake_frames)
+            ];
+        }
+        draw_sprite(spr_game_title, 0, _title_shake, 0);
         return;
     }
 

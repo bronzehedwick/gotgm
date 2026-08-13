@@ -56,9 +56,6 @@ function enemy_shot_line_clear(shooter, dir, flying) {
 function enemy_spawn_shot(shooter, dir, ignore_walls) {
     if (!instance_exists(shooter)) return noone;
     var _type = shooter.shot_type;
-    // A zero shot_type means the projectile is embedded in the shooter's own
-    // ACTOR resource (the underground spider is the first common example).
-    if (_type == 0) _type = shooter.actor_type_id;
     if (_type < 0 || _type >= 100) return noone;
     if (enemy_shot_count(shooter.id) >= shooter.shots_allowed) return noone;
 
@@ -88,6 +85,11 @@ function enemy_spawn_shot(shooter, dir, ignore_walls) {
         current_frame = 0;
         sprite_index = asset_get_index(shot_sprite_name(_type));
         image_speed = 0;
+        visible = true;
+        image_alpha = 1;
+        // Projectiles are actors in the DOS draw list and must remain in
+        // front of the room tiles and solid blocks.
+        depth = -10;
         x = shooter.x + (shooter.col_w - shot_w) * 0.5;
         y = shooter.y + (shooter.col_h - shot_h) * 0.5;
         angle_target_x = global.player.x;
@@ -119,7 +121,7 @@ function enemy_spawn_shot(shooter, dir, ignore_walls) {
 }
 
 function enemy_fire_pattern(shooter) {
-    if (!instance_exists(shooter) || shooter.shots_allowed <= 0 || shooter.shot_type >= 100) return;
+    if (!instance_exists(shooter) || shooter.shots_allowed <= 0 || shooter.shot_type < 0) return;
     if (global.player == noone || !instance_exists(global.player)) return;
     if (shooter.shot_cooldown > 0) {
         shooter.shot_cooldown--;
@@ -226,6 +228,20 @@ function enemy_fire_pattern(shooter) {
 
 function shot_try_move(dx, dy) {
     if (!check_move_enemy(x, y, shot_w, shot_h, dx, dy, shot_flying)) return false;
+
+    var _next_x = x + dx;
+    var _next_y = y + dy;
+    // check_move3() in the original source tests every solid actor after the
+    // background collision. This is what lets movable blocks stop Wormspit.
+    for (var _i = 0; _i < instance_number(obj_enemy); _i++) {
+        var _other = instance_find(obj_enemy, _i);
+        if (_other == noone || _other.id == creator_id || !_other.visible) continue;
+        if (_other.solid_type < 2) continue;
+        if (rectangle_in_rectangle(
+            _next_x, _next_y, _next_x + shot_w, _next_y + shot_h,
+            _other.x, _other.y, _other.x + 15, _other.y + 15
+        )) return false;
+    }
     x += dx;
     y += dy;
     return true;

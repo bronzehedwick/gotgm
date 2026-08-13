@@ -945,6 +945,8 @@
     {"id":{"name":"spr_tiles_ep3_51_33_36","path":"sprites/spr_tiles_ep3_51_33_36/spr_tiles_ep3_51_33_36.yy",},},
     {"id":{"name":"spr_tileset_ep1","path":"sprites/spr_tileset_ep1/spr_tileset_ep1.yy",},},
     {"id":{"name":"spr_title_menu","path":"sprites/spr_title_menu/spr_title_menu.yy",},},
+    {"id":{"name":"spr_title_card","path":"sprites/spr_title_card/spr_title_card.yy",},},
+    {"id":{"name":"spr_game_title","path":"sprites/spr_game_title/spr_game_title.yy",},},
     {"id":{"name":"ts_ep1_51_33_36","path":"tilesets/ts_ep1_51_33_36/ts_ep1_51_33_36.yy",},},
     {"id":{"name":"ts_ep1_53_36_39","path":"tilesets/ts_ep1_53_36_39/ts_ep1_53_36_39.yy",},},
     {"id":{"name":"ts_ep1_93_100_104","path":"tilesets/ts_ep1_93_100_104/ts_ep1_93_100_104.yy",},},

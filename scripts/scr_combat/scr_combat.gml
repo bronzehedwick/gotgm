@@ -16,6 +16,9 @@ function checkpoint_save() {
         selected_item: global.selected_item,
         quest_object: global.quest_object,
         inventory_json: json_stringify(global.inventory),
+        flags_json: json_stringify(global.flags),
+        collected_pickups_json: json_stringify(global.collected_pickups),
+        tile_overrides_json: json_stringify(global.tile_overrides),
         armor_level: global.armor_level,
         hammer_damage: global.hammer_damage,
     };
@@ -36,6 +39,12 @@ function checkpoint_restore() {
     global.selected_item = _save.selected_item;
     global.quest_object = _save.quest_object;
     global.inventory = json_parse(_save.inventory_json);
+    if (variable_struct_exists(_save, "flags_json"))
+        global.flags = json_parse(_save.flags_json);
+    if (variable_struct_exists(_save, "collected_pickups_json"))
+        global.collected_pickups = json_parse(_save.collected_pickups_json);
+    if (variable_struct_exists(_save, "tile_overrides_json"))
+        global.tile_overrides = json_parse(_save.tile_overrides_json);
     global.armor_level = variable_struct_exists(_save, "armor_level")
         ? _save.armor_level : ((_save.episode == 1) ? 0 : _save.episode - 1);
     global.hammer_damage = variable_struct_exists(_save, "hammer_damage")
@@ -66,6 +75,9 @@ function combat_spawn_death_effect(enemy_inst) {
     _effect.strength = 0;
     _effect.actor_slot = -1;
     _effect.effect_timer = 4;
+    _effect.death_source_def = enemy_inst.actor_def;
+    _effect.death_source_w = enemy_inst.col_w;
+    _effect.death_source_h = enemy_inst.col_h;
 }
 
 function combat_spawn_boss_explosion(px, py, frame) {
@@ -201,10 +213,19 @@ function combat_enemy_hit(enemy_inst, damage) {
     enemy_inst.vulnerable_timer = 20;
     if (enemy_inst.health <= 0) {
         enemy_inst.is_dead = true;
-        if (enemy_inst.actor_def != undefined) {
+        var _good_guy = enemy_inst.actor_def != undefined
+            && enemy_inst.actor_def.type == 4;
+        if (_good_guy) {
+            // kill_good_guy() in 1_MOVE.C deducts 1000 points and shows Odin's
+            // episode-specific 2010 reproach only for the first such killing.
+            global.score = max(0, global.score - 1000);
+            if (!global.kill_good_guy_informed && global.thunder_timer <= 0) {
+                global.kill_good_guy_informed = true;
+                dialogue_start(2010, spr_dialogue_odin);
+            }
+        } else if (enemy_inst.actor_def != undefined) {
             global.score = min(global.score + enemy_inst.actor_def.rating, MAX_SCORE);
         }
-        combat_drop_loot(enemy_inst);
         combat_spawn_death_effect(enemy_inst);
         with (enemy_inst) instance_destroy();
     }
@@ -363,11 +384,10 @@ function combat_update_progression() {
     }
 }
 
-function combat_drop_loot(enemy_inst) {
-    if (!instance_exists(enemy_inst) || enemy_inst.actor_def == undefined
-    || enemy_inst.actor_def.type != 2) return;
-    var _gx = (enemy_inst.x + enemy_inst.col_w * 0.5) div TILE_W;
-    var _gy = (enemy_inst.y + enemy_inst.col_h * 0.5) div TILE_H;
+function combat_drop_loot_definition(actor_definition, drop_x, drop_y, drop_w, drop_h) {
+    if (actor_definition == undefined || actor_definition.type != 2) return;
+    var _gx = (drop_x + drop_w * 0.5) div TILE_W;
+    var _gy = (drop_y + drop_h * 0.5) div TILE_H;
     if (_gx < 0 || _gx >= GRID_COLS || _gy < 0 || _gy >= GRID_ROWS
     || tile_get(_gx, _gy) < TILE_FLY) return;
 
@@ -385,6 +405,14 @@ function combat_drop_loot(enemy_inst) {
     else if ((_roll & 1) != 0) _type = (_rare < 10) ? 1 : 2;
     else _type = (_rare < 10) ? 3 : 4;
     pickup_spawn(_type, _px, _py);
+}
+
+function combat_drop_loot(enemy_inst) {
+    if (!instance_exists(enemy_inst)) return;
+    combat_drop_loot_definition(
+        enemy_inst.actor_def, enemy_inst.x, enemy_inst.y,
+        enemy_inst.col_w, enemy_inst.col_h
+    );
 }
 
 function combat_boss_hit(enemy_inst, damage) {

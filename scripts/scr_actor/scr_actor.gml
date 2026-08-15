@@ -45,6 +45,7 @@ function actor_configure(inst, actor_type, value, dir, invisible, source_slot = 
         current_frame = 0;
         movement_tick = false;
         vulnerable_timer = 0;
+        damage_flash_timer = 0;
         is_dead = false;
         pause_timer = 0;
         move_counter = 0;

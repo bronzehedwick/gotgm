@@ -465,6 +465,17 @@ def create_dialogue_resources(
 
     for episode in (1, 2, 3):
         source = archive.read(f"SPEAK{episode}").decode("cp437")
+        source = source.replace("\r\n", "\n").replace("\r", "\n")
+        source = "\n".join(line.rstrip() for line in source.split("\n"))
+        if episode == 1:
+            # The shipped script advertises five-jewel apples at McElroy's,
+            # and dialog_one() in 1_DIALOG.C calls buy_apples(..., 5). Keep
+            # the data-driven version consistent with that original routine.
+            source = source.replace(
+                "if @jewels > 6 then sound @GULP:pause 20:addjewels -7:addhealth 5:j=j+1",
+                "if @jewels > 4 then sound @GULP:pause 20:addjewels -5:addhealth 5:j=j+1",
+                1,
+            )
         (dialogue_dir / f"speak{episode}.got").write_text(source, encoding="utf-8")
         write_json(dialogue_dir / f"dialogue{episode}.json", _compile_dialogue(source))
 
@@ -600,6 +611,26 @@ def create_story_resources(archive: GotArchive) -> list[str]:
     for episode in (1, 2, 3):
         resources.extend(_create_story_resource(archive, episode))
     return resources
+
+
+def create_menu_resources(
+    archive: GotArchive,
+    palette: list[tuple[int, int, int, int]],
+) -> list[str]:
+    """Restore the four-frame HAMPIC cursor used by select_option()."""
+    data = archive.read("HAMPIC")
+    frames = [
+        decode_pic_block(data[offset:offset + PIC_BLOCK_SIZE], palette)
+        for offset in range(0, len(data), PIC_BLOCK_SIZE)
+        if len(data[offset:offset + PIC_BLOCK_SIZE]) == PIC_BLOCK_SIZE
+    ]
+    frame_image_resource(
+        "spr_menu_hammer",
+        frames,
+        folder_ref("UI", "folders/Sprites/UI.yy"),
+        playback_speed=0.0,
+    )
+    return ["spr_menu_hammer"]
 
 
 def create_actor_resources(archive: GotArchive,
@@ -1063,6 +1094,9 @@ def main() -> None:
 
     story_resources = create_story_resources(archive)
     generated_names.extend(story_resources)
+
+    menu_resources = create_menu_resources(archive, palette)
+    generated_names.extend(menu_resources)
 
     dialogue_resources = create_dialogue_resources(archive, palette)
     generated_names.extend(dialogue_resources)

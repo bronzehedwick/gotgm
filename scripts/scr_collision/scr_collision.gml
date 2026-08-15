@@ -45,10 +45,12 @@ function actor_player_collision(actor_inst, dx, dy) {
             if (actor_inst.special_cooldown <= 0) {
                 if (actor_inst.actor_def.func_pass == 0 && global.health < MAX_HEALTH) {
                     global.health++;
-                    audio_play_sound(snd_got_angel, 1, false);
+                    if (!audio_is_playing(snd_got_angel))
+                        audio_play_sound(snd_got_angel, 1, false);
                 } else if (actor_inst.actor_def.func_pass != 0 && global.magic < MAX_MAGIC) {
                     global.magic++;
-                    audio_play_sound(snd_got_angel, 1, false);
+                    if (!audio_is_playing(snd_got_angel))
+                        audio_play_sound(snd_got_angel, 1, false);
                 }
                 actor_inst.special_cooldown = 1;
             }

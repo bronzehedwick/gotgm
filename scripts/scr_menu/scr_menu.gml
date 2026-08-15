@@ -11,6 +11,8 @@ function menu_init() {
         selection: 0,
         status: "",
         status_timer: 0,
+        hammer_smack_timer: 0,
+        hammer_smack_sound: false,
         story_phase: 0,
         story_scroll: 0,
         story_delay: 0,
@@ -19,6 +21,7 @@ function menu_init() {
         game_title_timer: 0,
         game_title_music_started: false,
         page_lines: [],
+        item_choices: [],
     };
 }
 
@@ -32,6 +35,32 @@ function menu_set(mode, title, options, return_mode = "pause") {
     _m.return_mode = return_mode;
     _m.status = "";
     _m.status_timer = 0;
+    _m.hammer_smack_timer = 0;
+    _m.hammer_smack_sound = false;
+}
+
+function menu_story_sprite() {
+    switch (global.current_episode) {
+        case 1: return spr_story_ep1;
+        case 2: return spr_story_ep2;
+        case 3: return spr_story_ep3;
+    }
+    return -1;
+}
+
+function menu_hammer_smack_offset() {
+    var _timer = global.menu.hammer_smack_timer;
+    if (_timer <= 0) return 0;
+    // PANEL.C hammer_smack(): four two-pixel steps out, then four steps back.
+    var _offsets = [2, 4, 6, 8, 6, 4, 2, 0];
+    var _elapsed = 12 - _timer;
+    var _stage = clamp(floor(_elapsed * 8 / 12), 0, 7);
+    return _offsets[_stage];
+}
+
+function menu_start_hammer_smack() {
+    global.menu.hammer_smack_timer = 12;
+    global.menu.hammer_smack_sound = false;
 }
 
 function menu_show_title() {
@@ -52,7 +81,9 @@ function menu_show_title() {
 function menu_show_opening() {
     menu_set("opening", "", [], "title");
     global.menu.opening_timer = 0;
-    if (global.music_instance != -1) audio_stop_sound(global.music_instance);
+    // The Impulse splash is silent. Stop even untracked sounds/music left by
+    // a previous room or title visit before displaying it.
+    audio_stop_all();
     global.music_instance = -1;
     global.music_current_asset = -1;
 }
@@ -325,7 +356,63 @@ function menu_back() {
     if (_return == "title") menu_show_title();
     else if (_return == "player") menu_show_player();
     else if (_return == "episode") menu_show_episode();
+    else if (_return == "game") {
+        global.menu.active = false;
+        global.menu.mode = "none";
+    }
     else menu_open_pause();
+}
+
+function menu_item_name(item) {
+    switch (item) {
+        case 1: return "Enchanted Apple";
+        case 2: return "Lightning Power";
+        case 3: return "Winged Boots";
+        case 4: return "Wind Power";
+        case 5: return "Amulet of Protection";
+        case 6: return "Thunder Power";
+        case 7:
+            if (global.current_episode == 1) {
+                if (global.quest_object == 1) return "Shrub";
+                if (global.quest_object == 2) return "Child's Doll";
+            }
+            return "Quest Item";
+    }
+    return "";
+}
+
+function menu_item_sprite(item) {
+    var _pickup = -1;
+    if (item >= 1 && item <= 6) _pickup = item + 26;
+    else if (item == 7 && global.quest_object > 0) _pickup = global.quest_object + 11;
+    if (_pickup < 0) return -1;
+    return asset_get_index("spr_pickup_" + string(_pickup));
+}
+
+function menu_close_item_select() {
+    global.menu.active = false;
+    global.menu.mode = "none";
+    global.menu.item_choices = [];
+}
+
+function menu_open_item_select() {
+    var _choices = [];
+    for (var _item = 1; _item <= 6; _item++) {
+        if (magic_item_owned(_item)) array_push(_choices, _item);
+    }
+    if (global.quest_object > 0) array_push(_choices, 7);
+
+    var _m = global.menu;
+    _m.active = true;
+    _m.mode = "item_select";
+    _m.item_choices = _choices;
+    _m.selection = 0;
+    for (var _i = 0; _i < array_length(_choices); _i++) {
+        if (_choices[_i] == global.selected_item) {
+            _m.selection = _i;
+            break;
+        }
+    }
 }
 
 function menu_open_audio(return_mode) {
@@ -459,6 +546,32 @@ function menu_update() {
     if (_m.status_timer > 0) _m.status_timer--;
     else _m.status = "";
 
+    if (_m.mode == "item_select") {
+        var _count = array_length(_m.item_choices);
+        if (keyboard_check_pressed(vk_escape)) {
+            menu_close_item_select();
+            return;
+        }
+        if (_count <= 0) {
+            if (keyboard_check_pressed(vk_anykey)) menu_close_item_select();
+            return;
+        }
+        if (keyboard_check_pressed(vk_left)) {
+            _m.selection = (_m.selection + _count - 1) mod _count;
+            audio_play_sound(snd_got_woop, 2, false);
+        }
+        if (keyboard_check_pressed(vk_right)) {
+            _m.selection = (_m.selection + 1) mod _count;
+            audio_play_sound(snd_got_woop, 2, false);
+        }
+        if (keyboard_check_pressed(vk_space) || keyboard_check_pressed(vk_enter)
+        || keyboard_check_pressed(vk_alt) || keyboard_check_pressed(vk_control)) {
+            global.selected_item = _m.item_choices[_m.selection];
+            menu_close_item_select();
+        }
+        return;
+    }
+
     if (_m.mode == "opening") {
         _m.opening_timer++;
         if (_m.opening_timer >= 180 || keyboard_check_pressed(vk_anykey))
@@ -525,6 +638,16 @@ function menu_update() {
         return;
     }
 
+    if (_m.hammer_smack_timer > 0) {
+        _m.hammer_smack_timer--;
+        if (!_m.hammer_smack_sound && _m.hammer_smack_timer <= 6) {
+            _m.hammer_smack_sound = true;
+            audio_play_sound(snd_got_clang, 3, false);
+        }
+        if (_m.hammer_smack_timer <= 0) menu_activate();
+        return;
+    }
+
     if (keyboard_check_pressed(vk_home)) _m.selection = 0;
     if (keyboard_check_pressed(vk_end)) _m.selection = max(0, array_length(_m.options) - 1);
     if (keyboard_check_pressed(vk_up)) {
@@ -545,8 +668,7 @@ function menu_update() {
         return;
     }
     if (keyboard_check_pressed(vk_enter) || keyboard_check_pressed(vk_space)) {
-        audio_play_sound(snd_got_clang, 3, false);
-        menu_activate();
+        menu_start_hammer_smack();
     }
 }
 
@@ -574,7 +696,11 @@ function menu_draw_box() {
     for(var _i=0;_i<array_length(_m.options);_i++)
         draw_original_text_colour(_m.options[_i],_x1+32,_y1+28+_i*16,dialogue_markup_colour(0),false);
     if(array_length(_m.options)>0)
-        draw_sprite(spr_actor_103_hammeri,8+(floor(current_time/120) mod 4),_x1+8,_y1+24+_m.selection*16);
+        draw_sprite(
+            spr_menu_hammer, floor(current_time / 120) mod 4,
+            _x1 + 8 + menu_hammer_smack_offset(),
+            _y1 + 24 + _m.selection * 16
+        );
     if(string_length(_m.status)>0)
         draw_original_text_colour(_m.status,160-string_length(_m.status)*4,181,dialogue_markup_colour(4),true);
 }
@@ -582,12 +708,51 @@ function menu_draw_box() {
 function menu_draw_help() {
     dialogue_draw_frame();
     dialogue_draw_line("~1Help~0",144,68);
-    dialogue_draw_line("Move: Arrow keys / WASD",52,84);
-    dialogue_draw_line("Hammer: Space",52,95);
-    dialogue_draw_line("Magic: Z or Control",52,106);
-    dialogue_draw_line("Select Item: X or Shift",52,117);
-    dialogue_draw_line("Options: Escape",52,128);
-    dialogue_draw_line("~4Enter: Back",188,138);
+    dialogue_draw_line("Arrows: Move",52,80);
+    dialogue_draw_line("Alt: Throw Hammer",52,89);
+    dialogue_draw_line("Space: Select Item",52,98);
+    dialogue_draw_line("Ctrl: Use Item",52,107);
+    dialogue_draw_line("D: Die",52,116);
+    dialogue_draw_line("S/L: Save / Load",52,125);
+    dialogue_draw_line("Esc: Options",52,134);
+    dialogue_draw_line("~4Enter: Back",188,143);
+}
+
+function menu_draw_item_select() {
+    var _m = global.menu;
+    draw_set_colour(make_colour_rgb(131, 83, 47));
+    draw_rectangle(72, 64, 249, 145, false);
+    dialogue_draw_tile(192, 56, 48);
+    dialogue_draw_tile(193, 248, 48);
+    dialogue_draw_tile(194, 56, 144);
+    dialogue_draw_tile(195, 248, 144);
+    for (var _i = 0; _i < 11; _i++) {
+        dialogue_draw_tile(196, 72 + _i * 16, 48);
+        dialogue_draw_tile(197, 72 + _i * 16, 144);
+    }
+    for (var _i = 0; _i < 5; _i++) {
+        dialogue_draw_tile(198, 56, 64 + _i * 16);
+        dialogue_draw_tile(199, 248, 64 + _i * 16);
+    }
+
+    var _count = array_length(_m.item_choices);
+    if (_count <= 0) {
+        draw_original_text_colour("No Items Found", 104, 100, dialogue_markup_colour(0), false);
+        return;
+    }
+    for (var _i = 0; _i < _count; _i++) {
+        var _item = _m.item_choices[_i];
+        var _sprite = menu_item_sprite(_item);
+        if (_sprite != -1)
+            draw_sprite(_sprite, floor(current_time / 200) mod 4, 82 + (_item - 1) * 24, 72);
+    }
+    var _selected = _m.item_choices[_m.selection];
+    draw_set_colour(c_white);
+    draw_rectangle(78 + (_selected - 1) * 24, 70,
+                   98 + (_selected - 1) * 24, 90, true);
+    var _name = menu_item_name(_selected);
+    draw_original_text_colour(_name, 160 - string_length(_name) * 4, 114,
+                              dialogue_markup_colour(2), false);
 }
 
 function menu_draw_page() {
@@ -613,23 +778,24 @@ function menu_draw() {
     if (!_m.active) return;
 
     if (_m.mode == "story") {
-        var _story = asset_get_index("spr_story_ep" + string(global.current_episode));
+        draw_clear(c_black);
+        var _story = menu_story_sprite();
         if (_story != -1)
             draw_sprite_part(_story, 0, 0, floor(_m.story_scroll), 320, 240, 0, 0);
+        return;
+    }
+
+    if (_m.mode == "item_select") {
+        menu_draw_item_select();
         return;
     }
 
     if (_m.mode == "opening") {
         draw_clear(c_black);
         var _timer = _m.opening_timer;
-        var _shake = 0;
-        if (_timer < 72) {
-            var _shake_frames = [0, -3, 2, -2, 3, -1, 1, 0];
-            _shake = _shake_frames[_timer mod array_length(_shake_frames)];
-        }
         var _alpha = min(1, _timer / 12);
         if (_timer > 162) _alpha = min(_alpha, (180 - _timer) / 18);
-        draw_sprite_ext(spr_title_card, 0, _shake, 0, 1, 1, 0, c_white, _alpha);
+        draw_sprite_ext(spr_title_card, 0, 0, 0, 1, 1, 0, c_white, _alpha);
         return;
     }
 
@@ -651,9 +817,9 @@ function menu_draw() {
 
     if (_m.mode == "title") {
         draw_sprite(
-            spr_actor_103_hammeri,
-            8 + (floor(current_time / 120) mod 4),
-            96, 71 + _m.selection * 20
+            spr_menu_hammer,
+            floor(current_time / 120) mod 4,
+            96 + menu_hammer_smack_offset(), 71 + _m.selection * 20
         );
         if (string_length(_m.status) > 0)
             draw_original_text_colour(

@@ -31,7 +31,26 @@ if (global.health <= 0) {
 
 var _input = input_check();
 
-if (_input.item_next) magic_select_next();
+if (_input.die && global.thunder_timer <= 0) {
+    global.health = 0;
+    exit;
+}
+if (_input.save) {
+    if (menu_save_game()) dialogue_start(2009, spr_dialogue_odin);
+    exit;
+}
+if (_input.load) {
+    menu_load_game();
+    exit;
+}
+if (_input.help && global.thunder_timer <= 0) {
+    menu_set("help", "Help", [], "game");
+    exit;
+}
+if (_input.item_select && global.thunder_timer <= 0) {
+    menu_open_item_select();
+    exit;
+}
 var _magic_just_pressed = _input.magic && !magic_was_down;
 magic_update(_input.magic, _magic_just_pressed);
 magic_was_down = _input.magic;

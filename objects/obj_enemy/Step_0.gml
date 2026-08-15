@@ -31,4 +31,5 @@ var _pose = frame_sequence[clamp(current_frame, 0, array_length(frame_sequence) 
 image_index = _pose + ((directions > 1) ? facing * 4 : 0);
 
 if (vulnerable_timer > 0) vulnerable_timer--;
+if (damage_flash_timer > 0) damage_flash_timer--;
 image_speed = 0;

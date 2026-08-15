@@ -230,11 +230,19 @@ function move_bat_diagonal() {
 }
 
 function move_mushroom() {
-    if (pause_timer <= 0 && move_counter <= 0) pause_timer = 60;
+    if (pause_timer <= 0 && move_counter <= 0) {
+        pause_timer = 60;
+        // The setup branch in movement_thirteen() also returns before
+        // next_frame(), so the resting pose begins without an extra frame.
+        movement_tick = false;
+        return;
+    }
     if (pause_timer > 0) {
         pause_timer--;
         strength = 0;
         vulnerable_timer = max(vulnerable_timer, 5);
+        // movement_thirteen() returns without next_frame() while resting.
+        movement_tick = false;
         if (pause_timer <= 0) move_counter = 60;
         return;
     }

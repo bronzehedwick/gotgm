@@ -12,7 +12,8 @@ function input_check() {
             menu_show_title();
             return {
                 left: false, right: false, up: false, down: false,
-                fire: false, magic: false, item_next: false,
+                fire: false, magic: false, item_select: false,
+                die: false, save: false, load: false, help: false,
             };
         }
 
@@ -40,18 +41,24 @@ function input_check() {
             down: global.demo_down,
             fire: global.demo_fire,
             magic: global.demo_magic,
-            item_next: false,
+            item_select: false,
+            die: false, save: false, load: false, help: false,
         };
     }
 
+    // Original defaults from INIT.C and MAIN.C.
     var _input = {
-        left:  keyboard_check(vk_left)  || keyboard_check(ord("A")),
-        right: keyboard_check(vk_right) || keyboard_check(ord("D")),
-        up:    keyboard_check(vk_up)    || keyboard_check(ord("W")),
-        down:  keyboard_check(vk_down)  || keyboard_check(ord("S")),
-        fire:  keyboard_check_pressed(vk_space),
-        magic: keyboard_check(ord("Z")) || keyboard_check(vk_control),
-        item_next: keyboard_check_pressed(ord("X")) || keyboard_check_pressed(vk_shift),
+        left:  keyboard_check(vk_left),
+        right: keyboard_check(vk_right),
+        up:    keyboard_check(vk_up),
+        down:  keyboard_check(vk_down),
+        fire:  keyboard_check_pressed(vk_alt),
+        magic: keyboard_check(vk_control),
+        item_select: keyboard_check_pressed(vk_space),
+        die: keyboard_check_pressed(ord("D")),
+        save: keyboard_check_pressed(ord("S")),
+        load: keyboard_check_pressed(ord("L")),
+        help: keyboard_check_pressed(vk_f1),
     };
     return _input;
 }

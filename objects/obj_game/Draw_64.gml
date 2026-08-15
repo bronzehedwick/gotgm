@@ -17,12 +17,14 @@ if (global.thunder_timer > 0 && surface_exists(application_surface)) {
 var _panel_y = SCREEN_H;
 draw_sprite(spr_status_bar, 0, 0, _panel_y);
 
-if (global.selected_item >= 1 && global.selected_item <= 6) {
-    var _pickup_number = global.selected_item + 26;
+if ((global.selected_item >= 1 && global.selected_item <= 6)
+|| (global.selected_item == 7 && global.quest_object > 0)) {
+    var _pickup_number = (global.selected_item == 7)
+        ? global.quest_object + 11 : global.selected_item + 26;
     var _item_sprite = asset_get_index("spr_pickup_" + string(_pickup_number));
     if (_item_sprite != -1)
-        // PANEL.C display_item(): xfput(282, 8, ... objects[item + 25]).
-        draw_sprite(_item_sprite, floor(current_time / 200) mod 4, 282, _panel_y + 8);
+        // User-requested HUD alignment: three pixels left of PANEL.C's x=282.
+        draw_sprite(_item_sprite, floor(current_time / 200) mod 4, 279, _panel_y + 8);
 }
 
 // Original PANEL.C bar coordinates and palette colours.

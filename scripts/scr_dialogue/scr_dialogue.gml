@@ -18,7 +18,7 @@ function dialogue_build_labels(){
  var _d=global.dialogue;_d.labels={};
  for(var _i=0;_i<array_length(_d.lines);_i++){
   var _s=string_trim(_d.lines[_i]),_n=string_length(_s);
-  if(_n>1&&string_char_at(_s,_n)==":")
+  if(_n>1&&string_char_at(_s,_n)==":"&&string_pos(" ",_s)==0)
    _d.labels[$ string_upper(string_trim(string_copy(_s,1,_n-1)))]=_i+1;
  }
 }
@@ -35,7 +35,12 @@ function dialogue_start_actor(a){
  _num=string_repeat("0",max(0,2-string_length(_num)))+_num;
  var _d=global.dialogue;_d.active=true;_d.episode=global.current_episode;_d.speaker=a;
  _d.portrait=asset_get_index("spr_face_"+_num);_d.item_sprite=-1;
- if(!dialogue_set_entry(global.current_level*1000+a.actor_slot,true))return false;
+ var _entry_id=global.current_level*1000+a.actor_slot;
+ // dialog_five() records SEEN_BRIDGE after the Creekin's Bridge sign is read.
+ // Record it at interaction start as well so dismissing the TEXT page cannot
+ // lose the progression flag before Thor walks back to Relg's repair shop.
+ if(_d.episode==1&&_entry_id==52003)global.flags[$ "5"]=true;
+ if(!dialogue_set_entry(_entry_id,true))return false;
  dialogue_run();return true;
 }
 function dialogue_start(id,portrait){
@@ -94,7 +99,14 @@ function dialogue_enqueue_front(s){var _a=dialogue_split_commands(s);for(var _i=
 function dialogue_collect_quoted(){
  var _d=global.dialogue,_a=[],_quote=chr(34);while(_d.pc<array_length(_d.lines)){var _s=string_trim(_d.lines[_d.pc]);
   if(string_length(_s)==0){_d.pc++;continue;}
-  if(string_char_at(_s,1)!=_quote)break;_d.pc++;array_push(_a,dialogue_eval_string(_s));}return _a;
+  if(string_char_at(_s,1)==_quote){_d.pc++;array_push(_a,dialogue_eval_string(_s));continue;}
+  // SCRIPT.C SAY accepts string variables as display lines too. The hermit's
+  // randomized doll response is the single line `a$`, not a quoted literal.
+  if(string_char_at(_s,string_length(_s))=="$"){
+   _d.pc++;array_push(_a,dialogue_eval_string(_s));continue;
+  }
+  break;
+ }return _a;
 }
 function dialogue_wrap(lines,width){
  var _a=[];for(var _j=0;_j<array_length(lines);_j++){var _s=lines[_j];if(string_length(_s)==0){array_push(_a,"");continue;}
@@ -213,8 +225,16 @@ function dialogue_execute(s){
  var _args=(_sp>0)?string_trim(string_copy(s,_sp+1,string_length(s)-_sp)):"";
  switch(_name){
  case"END":dialogue_close();return;case"GOTO":dialogue_goto(_args);return;
- case"GOSUB":array_push(_d.calls,_d.pc);dialogue_goto(_args);return;
- case"RETURN":if(array_length(_d.calls)>0){_d.pc=array_pop(_d.calls);_d.pending=[];}else dialogue_close();return;
+ case"GOSUB":
+  // SCRIPT.C resumes at the next colon command after RETURN, not merely at
+  // the next source line. Preserve both that queue and the caller's IF state.
+  array_push(_d.calls,{pc:_d.pc,pending:_d.pending,last_if:_d.last_if});
+  dialogue_goto(_args);return;
+ case"RETURN":
+  if(array_length(_d.calls)>0){
+   var _call=array_pop(_d.calls);_d.pc=_call.pc;_d.pending=_call.pending;
+   _d.last_if=_call.last_if;
+  }else dialogue_close();return;
  case"RUN":dialogue_set_entry(dialogue_eval_numeric(_args),false);return;
  case"IF":
   var _then=string_pos(" THEN ",_u);if(_then<=0)return;var _condition=string_copy(s,3,_then-3);
@@ -225,7 +245,13 @@ function dialogue_execute(s){
   // A successful IF must return after queuing its THEN clause. Falling into
   // ELSE discarded the queued purchase command, so shop selections did nothing.
   return;
- case"ELSE":if(!_d.last_if)dialogue_enqueue_front(_args);return;
+ case"ELSE":
+  // Keep a nested ELSE IF intact. Its colon-separated THEN commands belong
+  // to that condition and must not be queued unconditionally.
+  if(!_d.last_if){
+   if(string_pos("IF ",string_upper(_args))==1)array_insert(_d.pending,0,_args);
+   else dialogue_enqueue_front(_args);
+  }return;
  case"SAY":case"TEXT":case"ITEMSAY":
   _d.text_lines=dialogue_collect_quoted();_d.page=0;_d.reveal_count=0;_d.reveal_timer=0;
   _d.item_sprite=-1;if(_name=="TEXT")_d.portrait=-1;
@@ -265,7 +291,12 @@ function dialogue_run(){
  var _d=global.dialogue,_safe=0;while(_d.active&&_d.mode=="running"&&_safe<200){_safe++;var _cmd="";
   if(array_length(_d.pending)>0){_cmd=_d.pending[0];array_delete(_d.pending,0,1);}
   else{if(_d.pc>=array_length(_d.lines)){dialogue_close();break;}var _line=string_trim(_d.lines[_d.pc]);_d.pc++;
-   if(string_length(_line)==0)continue;if(string_char_at(_line,string_length(_line))==":")continue;
+   if(string_length(_line)==0)continue;
+   if(string_char_at(_line,string_length(_line))==":"&&string_pos(" ",_line)==0)continue;
+   var _upper_line=string_upper(_line);
+   var _conditional=(string_pos("IF ",_upper_line)==1
+    ||string_pos("ELSE ",_upper_line)==1);
+   if(_conditional){array_push(_d.pending,_line);continue;}
    var _commands=dialogue_split_commands(_line);for(var _i=0;_i<array_length(_commands);_i++)array_push(_d.pending,_commands[_i]);continue;}
   dialogue_execute(_cmd);}if(_safe>=200)show_debug_message("Dialogue safety stop #"+_d.entry);
 }

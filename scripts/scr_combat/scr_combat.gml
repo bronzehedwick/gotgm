@@ -124,6 +124,9 @@ function combat_player_hit(damage) {
         else if (global.armor_level >= 2) damage -= damage div 3;
     }
 
+    // thor_damaged() only plays OW and sets actor.show when damage is nonzero.
+    // RAINBOW (actor 99) has strength 0 and is safe to touch in Part 2.
+    if (damage <= 0) return;
 
     audio_play_sound(snd_got_ow, 2, false);
     global.health = max(0, global.health - damage);
@@ -211,6 +214,7 @@ function combat_enemy_hit(enemy_inst, damage) {
     audio_play_sound(snd_got_punch, 1, false);
     enemy_inst.health -= _scaled_damage;
     enemy_inst.vulnerable_timer = 20;
+    enemy_inst.damage_flash_timer = 10;
     if (enemy_inst.health <= 0) {
         enemy_inst.is_dead = true;
         var _good_guy = enemy_inst.actor_def != undefined
